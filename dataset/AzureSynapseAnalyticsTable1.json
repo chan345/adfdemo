@@ -1,0 +1,61 @@
+{
+	"name": "AzureSynapseAnalyticsTable1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSynapseAnalytics",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlDWTable",
+		"schema": [
+			{
+				"name": "customer_Id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "DOB",
+				"type": "date"
+			},
+			{
+				"name": "Gender",
+				"type": "varchar"
+			},
+			{
+				"name": "city_code",
+				"type": "varchar"
+			},
+			{
+				"name": "Customer_Name",
+				"type": "varchar"
+			},
+			{
+				"name": "active_flag",
+				"type": "varchar"
+			},
+			{
+				"name": "efective_start_date",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "efective_end_date",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "last_updated_date",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "customer"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

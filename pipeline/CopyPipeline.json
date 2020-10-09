@@ -1,0 +1,140 @@
+{
+	"name": "CopyPipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy_rj2",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Source",
+						"value": "input//Customer.csv"
+					},
+					{
+						"name": "Destination",
+						"value": "test12.Azure Blob Storage file"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings",
+							"skipLineCount": 0
+						}
+					},
+					"sink": {
+						"type": "SqlDWSink",
+						"allowPolyBase": true,
+						"polyBaseSettings": {
+							"rejectValue": 0,
+							"rejectType": "value",
+							"useTypeDefault": true
+						},
+						"tableOption": "autoCreate"
+					},
+					"enableStaging": true,
+					"stagingSettings": {
+						"linkedServiceName": {
+							"referenceName": "stage_plybase",
+							"type": "LinkedServiceReference"
+						},
+						"path": "stage"
+					},
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "customer_Id",
+									"type": "String"
+								},
+								"sink": {
+									"name": "customer_Id",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "DOB",
+									"type": "String"
+								},
+								"sink": {
+									"name": "DOB",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Gender",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Gender",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "city_code",
+									"type": "String"
+								},
+								"sink": {
+									"name": "city_code",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Customer_Name",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Customer_Name",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Created_Modified_Date",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Created_Modified_Date",
+									"type": "String"
+								}
+							}
+						]
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_rj2",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_rj2",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2020-10-05T06:58:32Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

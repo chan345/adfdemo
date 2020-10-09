@@ -1,0 +1,17 @@
+{
+	"name": "SqlServer_on_premises",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"connectionString": "integrated security=True;data source=HMECL002028;initial catalog=testdb",
+			"userName": "HAPPIESTMINDS\\Chandra.babu",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiIwOTRjMGFkYS0yMTVjLTQ4ODQtODIwMC0wMWU3ZjA0YjQwODAiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "selfhostedIR",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
