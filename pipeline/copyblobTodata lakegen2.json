@@ -1,0 +1,144 @@
+{
+	"name": "copyblobTodata lakegen2",
+	"properties": {
+		"activities": [
+			{
+				"name": "customer_copy_data",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".csv"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "customer_blob_input",
+						"type": "DatasetReference",
+						"parameters": {
+							"filename": "Customer.CSV"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "datalake_output",
+						"type": "DatasetReference",
+						"parameters": {
+							"datalake_filename": "customer.csv"
+						}
+					}
+				]
+			},
+			{
+				"name": "transcation_copy_data",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "customer_copy_data",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".csv"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "customer_blob_input",
+						"type": "DatasetReference",
+						"parameters": {
+							"filename": "Transactions.csv"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "datalake_output",
+						"type": "DatasetReference",
+						"parameters": {
+							"datalake_filename": "Transactions.csv"
+						}
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "Demo"
+		},
+		"annotations": []
+	}
+}
