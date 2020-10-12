@@ -877,6 +877,13 @@
 								"type": "DatasetReference"
 							},
 							"name": "maxsurgarekey"
+						},
+						{
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsTable1",
+								"type": "DatasetReference"
+							},
+							"name": "incremental"
 						}
 					],
 					"sinks": [
@@ -885,7 +892,7 @@
 								"referenceName": "AzureSynapseAnalyticsTable1",
 								"type": "DatasetReference"
 							},
-							"name": "targetcustomer"
+							"name": "updatecustomer"
 						},
 						{
 							"dataset": {
@@ -903,25 +910,31 @@
 							"name": "AlterRow1"
 						},
 						{
-							"name": "Updateflow"
-						},
-						{
 							"name": "insertflow"
 						},
 						{
 							"name": "generatesurgatekey"
 						},
 						{
-							"name": "DerivedColumn2"
+							"name": "JoinDerivedColumn"
 						},
 						{
 							"name": "Lookupmaxkey"
 						},
 						{
 							"name": "SurrogateKey"
+						},
+						{
+							"name": "Joinincremental"
+						},
+						{
+							"name": "incrementaldata"
+						},
+						{
+							"name": "updateflowProcess"
 						}
 					],
-					"script": "source(output(\n\t\tcustomer_Id as integer,\n\t\tDOB as string,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tCreated_Modified_Date as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> inputcustomer\nsource(output(\n\t\tD_KEY as integer,\n\t\tcustomer_Id as integer,\n\t\tDOB as date,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tlast_updated_date as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> dcustomer\nsource(output(\n\t\tD_KEY as integer,\n\t\tout_key as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'select max(D_KEY) as D_KEY,\\'1\\' as out_key from D_customer',\n\tformat: 'query',\n\tstaged: false) ~> maxsurgarekey\ninputcustomer derive(DOB = toDate(DOB,'dd-MM-yyyy'),\n\t\tCreated_Modified_Date = toTimestamp(Created_Modified_Date,'dd-MM-yyyy HH:mm')) ~> datatypechange\nUpdateflow alterRow(updateIf(true())) ~> AlterRow1\ndatatypechange, dcustomer exists(inputcustomer@customer_Id == dcustomer@customer_Id,\n\tnegate:false,\n\tbroadcast: 'auto')~> Updateflow\ndatatypechange, dcustomer exists(inputcustomer@customer_Id == dcustomer@customer_Id,\n\tnegate:true,\n\tbroadcast: 'auto')~> insertflow\nSurrogateKey derive(out_D_KEY = D_KEY+surgate_key) ~> generatesurgatekey\ninsertflow derive(input_key = '1') ~> DerivedColumn2\nDerivedColumn2, maxsurgarekey lookup(input_key == out_key,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookupmaxkey\nLookupmaxkey keyGenerate(output(surgate_key as long),\n\tstartAt: 1L) ~> SurrogateKey\nAlterRow1 sink(input(\n\t\tD_KEY as integer,\n\t\tcustomer_Id as integer,\n\t\tDOB as date,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tlast_updated_date as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:true,\n\tupsertable:false,\n\tkeys:['customer_Id'],\n\tformat: 'table',\n\tstaged: true,\n\tmapColumn(\n\t\tcustomer_Id,\n\t\tDOB,\n\t\tGender,\n\t\tcity_code,\n\t\tCustomer_Name,\n\t\tlast_updated_date = Created_Modified_Date\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> targetcustomer\ngeneratesurgatekey sink(input(\n\t\tD_KEY as integer,\n\t\tcustomer_Id as integer,\n\t\tDOB as date,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tlast_updated_date as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tmapColumn(\n\t\tcustomer_Id,\n\t\tDOB,\n\t\tGender,\n\t\tcity_code,\n\t\tCustomer_Name,\n\t\tlast_updated_date = Created_Modified_Date,\n\t\tD_KEY = out_D_KEY\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> insertcustomer"
+					"script": "source(output(\n\t\tcustomer_Id as integer,\n\t\tDOB as string,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tCreated_Modified_Date as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> inputcustomer\nsource(output(\n\t\tD_KEY as integer,\n\t\tcustomer_Id as integer,\n\t\tDOB as date,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tlast_updated_date as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> dcustomer\nsource(output(\n\t\tD_KEY as integer,\n\t\tout_key as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'select max(D_KEY) as D_KEY,\\'1\\' as out_key from D_customer',\n\tformat: 'query',\n\tstaged: false) ~> maxsurgarekey\nsource(output(\n\t\tSrc_Tab as string,\n\t\tWatermark_Value as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'select [Src_Tab],[Watermark_Value] from config',\n\tformat: 'query',\n\tstaged: false) ~> incremental\ninputcustomer derive(DOB = toDate(DOB,'dd-MM-yyyy'),\n\t\tCreated_Modified_Date = toTimestamp(Created_Modified_Date,'dd-MM-yyyy HH:mm'),\n\t\tinput_tablename = 'D_customer') ~> datatypechange\nupdateflowProcess alterRow(updateIf(true())) ~> AlterRow1\nincrementaldata, dcustomer exists(inputcustomer@customer_Id == dcustomer@customer_Id,\n\tnegate:true,\n\tbroadcast: 'auto')~> insertflow\nSurrogateKey derive(out_D_KEY = D_KEY+surgate_key) ~> generatesurgatekey\ninsertflow derive(input_key = '1') ~> JoinDerivedColumn\nJoinDerivedColumn, maxsurgarekey lookup(input_key == out_key,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookupmaxkey\nLookupmaxkey keyGenerate(output(surgate_key as long),\n\tstartAt: 1L) ~> SurrogateKey\ndatatypechange, incremental join(input_tablename == Src_Tab,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Joinincremental\nJoinincremental filter(Created_Modified_Date > Watermark_Value) ~> incrementaldata\nincrementaldata, dcustomer exists(inputcustomer@customer_Id == dcustomer@customer_Id,\n\tnegate:false,\n\tbroadcast: 'auto')~> updateflowProcess\nAlterRow1 sink(input(\n\t\tD_KEY as integer,\n\t\tcustomer_Id as integer,\n\t\tDOB as date,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tlast_updated_date as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:true,\n\tupsertable:false,\n\tkeys:['customer_Id'],\n\tformat: 'table',\n\tstaged: true,\n\tpostSQLs:['update config set [Watermark_Value]= (select max(last_updated_date) from D_customer) where [Src_Tab]=\\'D_customer\\''],\n\tmapColumn(\n\t\tcustomer_Id,\n\t\tDOB,\n\t\tGender,\n\t\tcity_code,\n\t\tCustomer_Name,\n\t\tlast_updated_date = Created_Modified_Date\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tsaveOrder: 2) ~> updatecustomer\ngeneratesurgatekey sink(input(\n\t\tD_KEY as integer,\n\t\tcustomer_Id as integer,\n\t\tDOB as date,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tlast_updated_date as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tmapColumn(\n\t\tcustomer_Id,\n\t\tDOB,\n\t\tGender,\n\t\tcity_code,\n\t\tCustomer_Name,\n\t\tlast_updated_date = Created_Modified_Date,\n\t\tD_KEY = out_D_KEY\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tsaveOrder: 1) ~> insertcustomer"
 				}
 			},
 			"dependsOn": [
@@ -956,7 +969,8 @@
 									"inputcustomer": {},
 									"dcustomer": {},
 									"maxsurgarekey": {},
-									"targetcustomer": {},
+									"incremental": {},
+									"updatecustomer": {},
 									"insertcustomer": {}
 								}
 							},
@@ -972,6 +986,71 @@
 								"computeType": "General"
 							}
 						}
+					},
+					{
+						"name": "Sucess_email_notification",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "customerdataflow",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "email_notification",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"PipelineName": {
+									"value": "@pipeline().Pipeline",
+									"type": "Expression"
+								},
+								"DataFactoryName": {
+									"value": "@pipeline().DataFactory",
+									"type": "Expression"
+								},
+								"Message": "Pipeline successfully completed."
+							}
+						}
+					},
+					{
+						"name": "Failure_email_notification",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "customerdataflow",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "email_notification",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"PipelineName": {
+									"value": "@pipeline().Pipeline",
+									"type": "Expression"
+								},
+								"DataFactoryName": {
+									"value": "@pipeline().DataFactory",
+									"type": "Expression"
+								},
+								"Message": {
+									"value": "@activity('customerdataflow').Error.Message",
+									"type": "Expression"
+								}
+							}
+						}
 					}
 				],
 				"folder": {
@@ -981,7 +1060,8 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/customerdataflow')]",
-				"[concat(variables('factoryId'), '/linkedServices/stage_plybase')]"
+				"[concat(variables('factoryId'), '/linkedServices/stage_plybase')]",
+				"[concat(variables('factoryId'), '/pipelines/email_notification')]"
 			]
 		}
 	]
