@@ -21,7 +21,7 @@
 						"Content-Type": "application/json"
 					},
 					"body": {
-						"value": "{\n\"DataFactoryName\":\"@{pipeline().parameters.DataFactoryName}\",\n\"PipelineName\":\"@{pipeline().parameters.PipelineName}\",\n\"ErrorMessage\":\"@{pipeline().parameters.ErrorMessage}\"\n}",
+						"value": "{\n\"DataFactoryName\":\"@{pipeline().parameters.DataFactoryName}\",\n\"PipelineName\":\"@{pipeline().parameters.PipelineName}\",\n\"ErrorMessage\":\"@{pipeline().parameters.Message}\"\n}",
 						"type": "Expression"
 					}
 				}
@@ -34,7 +34,7 @@
 			"DataFactoryName": {
 				"type": "string"
 			},
-			"ErrorMessage": {
+			"Message": {
 				"type": "string"
 			}
 		},

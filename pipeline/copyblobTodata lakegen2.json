@@ -51,7 +51,7 @@
 						"referenceName": "customer_blob_input",
 						"type": "DatasetReference",
 						"parameters": {
-							"filename": "Customer1.CSV"
+							"filename": "Customer.csv"
 						}
 					}
 				],
@@ -162,7 +162,7 @@
 							"value": "@pipeline().DataFactory",
 							"type": "Expression"
 						},
-						"ErrorMessage": {
+						"Message": {
 							"value": "@activity('customer_copy_data').Error.Message",
 							"type": "Expression"
 						}
@@ -196,10 +196,41 @@
 							"value": "@pipeline().DataFactory",
 							"type": "Expression"
 						},
-						"ErrorMessage": {
+						"Message": {
 							"value": "@activity('transcation_copy_data').Error.Message",
 							"type": "Expression"
 						}
+					}
+				}
+			},
+			{
+				"name": "Pipeline_Sucess_notification",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "transcation_copy_data",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "email_notification",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"PipelineName": {
+							"value": "@pipeline().Pipeline",
+							"type": "Expression"
+						},
+						"DataFactoryName": {
+							"value": "@pipeline().DataFactory",
+							"type": "Expression"
+						},
+						"Message": "Pipeline Successfully completed. "
 					}
 				}
 			}
