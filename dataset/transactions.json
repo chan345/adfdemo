@@ -1,0 +1,70 @@
+{
+	"name": "transactions",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSynapseAnalytics",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlDWTable",
+		"schema": [
+			{
+				"name": "Transaction_key",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "customer_Key",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "transaction_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "tran_date",
+				"type": "date"
+			},
+			{
+				"name": "prod_subcat_code",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "prod_cat_code",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Qty",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Rate",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Tax",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "total_amt",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Store_type",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Transactions"
+		}
+	}
+}
