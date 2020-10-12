@@ -874,6 +874,13 @@
 								"type": "DatasetReference"
 							},
 							"name": "inputcustomer"
+						},
+						{
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsTable1",
+								"type": "DatasetReference"
+							},
+							"name": "dcustomer"
 						}
 					],
 					"sinks": [
@@ -882,7 +889,14 @@
 								"referenceName": "AzureSynapseAnalyticsTable1",
 								"type": "DatasetReference"
 							},
-							"name": "Dcustomer"
+							"name": "targetcustomer"
+						},
+						{
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsTable1",
+								"type": "DatasetReference"
+							},
+							"name": "insertcustomer"
 						}
 					],
 					"transformations": [
@@ -891,14 +905,74 @@
 						},
 						{
 							"name": "AlterRow1"
+						},
+						{
+							"name": "Updateflow"
+						},
+						{
+							"name": "insertflow"
 						}
 					],
-					"script": "source(output(\n\t\tcustomer_Id as integer,\n\t\tDOB as string,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tCreated_Modified_Date as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tlimit: 4) ~> inputcustomer\ninputcustomer derive(DOB = toDate(DOB,'dd-MM-yyyy'),\n\t\tCreated_Modified_Date = toTimestamp(Created_Modified_Date,'dd-MM-yyyy HH:mm')) ~> datatypechange\ndatatypechange alterRow(upsertIf(true())) ~> AlterRow1\nAlterRow1 sink(input(\n\t\tcustomer_Id as integer,\n\t\tDOB as date,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tactive_flag as string,\n\t\tefective_start_date as timestamp,\n\t\tefective_end_date as timestamp,\n\t\tlast_updated_date as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['customer_Id'],\n\tformat: 'table',\n\tstaged: true,\n\tmapColumn(\n\t\tcustomer_Id,\n\t\tDOB,\n\t\tGender,\n\t\tcity_code,\n\t\tCustomer_Name,\n\t\tlast_updated_date = Created_Modified_Date\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Dcustomer"
+					"script": "source(output(\n\t\tcustomer_Id as integer,\n\t\tDOB as string,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tCreated_Modified_Date as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tlimit: 4) ~> inputcustomer\nsource(output(\n\t\tcustomer_Id as integer,\n\t\tDOB as date,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tactive_flag as string,\n\t\tefective_start_date as timestamp,\n\t\tefective_end_date as timestamp,\n\t\tlast_updated_date as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> dcustomer\ninputcustomer derive(DOB = toDate(DOB,'dd-MM-yyyy'),\n\t\tCreated_Modified_Date = toTimestamp(Created_Modified_Date,'dd-MM-yyyy HH:mm')) ~> datatypechange\nUpdateflow alterRow(updateIf(true())) ~> AlterRow1\ndatatypechange, dcustomer exists(inputcustomer@customer_Id == dcustomer@customer_Id,\n\tnegate:false,\n\tbroadcast: 'auto')~> Updateflow\ndatatypechange, dcustomer exists(inputcustomer@customer_Id == dcustomer@customer_Id,\n\tnegate:true,\n\tbroadcast: 'auto')~> insertflow\nAlterRow1 sink(input(\n\t\tcustomer_Id as integer,\n\t\tDOB as date,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tactive_flag as string,\n\t\tefective_start_date as timestamp,\n\t\tefective_end_date as timestamp,\n\t\tlast_updated_date as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:true,\n\tupsertable:false,\n\tkeys:['customer_Id'],\n\tformat: 'table',\n\tstaged: true,\n\tmapColumn(\n\t\tcustomer_Id,\n\t\tDOB,\n\t\tGender,\n\t\tcity_code,\n\t\tCustomer_Name,\n\t\tlast_updated_date = Created_Modified_Date\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> targetcustomer\ninsertflow sink(input(\n\t\tcustomer_Id as integer,\n\t\tDOB as date,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tactive_flag as string,\n\t\tefective_start_date as timestamp,\n\t\tefective_end_date as timestamp,\n\t\tlast_updated_date as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tmapColumn(\n\t\tcustomer_Id,\n\t\tDOB,\n\t\tGender,\n\t\tcity_code,\n\t\tCustomer_Name,\n\t\tlast_updated_date = Created_Modified_Date\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> insertcustomer"
 				}
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/datalake_output')]",
 				"[concat(variables('factoryId'), '/datasets/AzureSynapseAnalyticsTable1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline_customer_dataflow')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "customerdataflow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "customerdataflow",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"inputcustomer": {},
+									"dcustomer": {},
+									"targetcustomer": {},
+									"insertcustomer": {}
+								}
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "stage_plybase",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "stage"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
+					}
+				],
+				"folder": {
+					"name": "Demo"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/customerdataflow')]",
+				"[concat(variables('factoryId'), '/linkedServices/stage_plybase')]"
 			]
 		}
 	]
