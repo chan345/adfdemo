@@ -136,7 +136,7 @@
 				]
 			},
 			{
-				"name": "Failure_Notification",
+				"name": "Customer_Failure_Notification",
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
@@ -170,7 +170,7 @@
 				}
 			},
 			{
-				"name": "Failure_notification2",
+				"name": "Transaction_Failure_notification",
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
