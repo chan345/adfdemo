@@ -51,7 +51,7 @@
 						"referenceName": "customer_blob_input",
 						"type": "DatasetReference",
 						"parameters": {
-							"filename": "Customer.CSV"
+							"filename": "Customer1.CSV"
 						}
 					}
 				],
@@ -134,6 +134,40 @@
 						}
 					}
 				]
+			},
+			{
+				"name": "Failure_Notification",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "customer_copy_data",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "email_notification",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"PipelineName": {
+							"value": "@pipeline().Pipeline",
+							"type": "Expression"
+						},
+						"DataFactoryName": {
+							"value": "@pipeline().DataFactory",
+							"type": "Expression"
+						},
+						"ErrorMessage": {
+							"value": "@activity('customer_copy_data').Error.Message",
+							"type": "Expression"
+						}
+					}
+				}
 			}
 		],
 		"folder": {
