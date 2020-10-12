@@ -168,6 +168,40 @@
 						}
 					}
 				}
+			},
+			{
+				"name": "Failure_notification2",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "transcation_copy_data",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "email_notification",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"PipelineName": {
+							"value": "@pipeline().Pipeline",
+							"type": "Expression"
+						},
+						"DataFactoryName": {
+							"value": "@pipeline().DataFactory",
+							"type": "Expression"
+						},
+						"ErrorMessage": {
+							"value": "@activity('transcation_copy_data').Error.Message",
+							"type": "Expression"
+						}
+					}
+				}
 			}
 		],
 		"folder": {
