@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "chandraadf123"
 		},
+		"AzureDataLakeStorage_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage'"
+		},
 		"AzureSynapseAnalytics_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureSynapseAnalytics'"
@@ -27,6 +31,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'SqlServer_on_premises'"
 		},
+		"AzureDataLakeStorage_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://datalake234.dfs.core.windows.net"
+		},
 		"SqlServer_on_premises_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "HAPPIESTMINDS\\Chandra.babu"
@@ -36,6 +44,56 @@
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/email_notification')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Notification",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": "https://prod-05.eastus.logic.azure.com:443/workflows/ae67bdeb6d4f4a8fb647ed7a3433a8df/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=S4t4UsOTmOV1NidY4yngUuYcrxy0Yugrp2lrsDBpb9c",
+							"method": "POST",
+							"headers": {
+								"Content-Type": "application/json"
+							},
+							"body": {
+								"value": "{\n\"DataFactoryName\":\"@{pipeline().parameters.DataFactoryName}\",\n\"PipelineName\":\"@{pipeline().parameters.PipelineName}\",\n\"ErrorMessage\":\"@{pipeline().parameters.Message}\"\n}",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"parameters": {
+					"PipelineName": {
+						"type": "string"
+					},
+					"DataFactoryName": {
+						"type": "string"
+					},
+					"Message": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "Demo"
+				},
+				"annotations": [],
+				"lastPublishTime": "2020-09-21T09:56:04Z"
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/test')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
@@ -59,6 +117,23 @@
 					}
 				},
 				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorage')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('AzureDataLakeStorage_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('AzureDataLakeStorage_accountKey')]"
+					}
+				}
 			},
 			"dependsOn": []
 		},
@@ -259,17 +334,25 @@
 					"referenceName": "blob_input",
 					"type": "LinkedServiceReference"
 				},
+				"parameters": {
+					"filename": {
+						"type": "string"
+					}
+				},
 				"annotations": [],
 				"type": "DelimitedText",
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"fileName": "Customer.csv",
+						"fileName": {
+							"value": "@dataset().filename",
+							"type": "Expression"
+						},
 						"container": "input"
 					},
 					"columnDelimiter": ",",
 					"escapeChar": "\\",
-					"firstRowAsHeader": true,
+					"firstRowAsHeader": false,
 					"quoteChar": "\""
 				},
 				"schema": [
@@ -301,6 +384,37 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/blob_input')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/datalake_output')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"datalake_filename": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "output"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage')]"
 			]
 		},
 		{
@@ -476,52 +590,14 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/dataflow1')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "customer_blob_input",
-								"type": "DatasetReference"
-							},
-							"name": "customersource"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "AzureSynapseAnalyticsTable1",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [
-						{
-							"name": "DerivedColumn1"
-						}
-					],
-					"script": "source(output(\n\t\tcustomer_Id as integer,\n\t\tDOB as string,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tCreated_Modified_Date as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> customersource\ncustomersource derive(DOB = toDate(DOB,'dd-MM-yyyy'),\n\t\tCreated_Modified_Date = toTimestamp(Created_Modified_Date,'dd-MM-yyyy HH:mm')) ~> DerivedColumn1\nDerivedColumn1 sink(input(\n\t\tcustomer_Id as integer,\n\t\tDOB as date,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tactive_flag as string,\n\t\tefective_start_date as timestamp,\n\t\tefective_end_date as timestamp,\n\t\tlast_updated_date as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tmapColumn(\n\t\tcustomer_Id,\n\t\tDOB,\n\t\tGender,\n\t\tcity_code,\n\t\tCustomer_Name,\n\t\tlast_updated_date = Created_Modified_Date\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/customer_blob_input')]",
-				"[concat(variables('factoryId'), '/datasets/AzureSynapseAnalyticsTable1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/customer_pipeline')]",
+			"name": "[concat(parameters('factoryName'), '/copyblobTodata lakegen2')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"activities": [
 					{
-						"name": "dataflow1",
-						"type": "ExecuteDataFlow",
+						"name": "customer_copy_data",
+						"type": "Copy",
 						"dependsOn": [],
 						"policy": {
 							"timeout": "7.00:00:00",
@@ -532,35 +608,235 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"dataflow": {
-								"referenceName": "dataflow1",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"customersource": {},
-									"sink1": {}
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
 								}
 							},
-							"staging": {
-								"linkedService": {
-									"referenceName": "stage_plybase",
-									"type": "LinkedServiceReference"
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
 								},
-								"folderPath": "stage"
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".csv"
+								}
 							},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "customer_blob_input",
+								"type": "DatasetReference",
+								"parameters": {
+									"filename": "Customer.csv"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "datalake_output",
+								"type": "DatasetReference",
+								"parameters": {
+									"datalake_filename": "customer.csv"
+								}
+							}
+						]
+					},
+					{
+						"name": "transcation_copy_data",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "customer_copy_data",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".csv"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "customer_blob_input",
+								"type": "DatasetReference",
+								"parameters": {
+									"filename": "Transactions.csv"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "datalake_output",
+								"type": "DatasetReference",
+								"parameters": {
+									"datalake_filename": "Transactions.csv"
+								}
+							}
+						]
+					},
+					{
+						"name": "Customer_Failure_Notification",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "customer_copy_data",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "email_notification",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"PipelineName": {
+									"value": "@pipeline().Pipeline",
+									"type": "Expression"
+								},
+								"DataFactoryName": {
+									"value": "@pipeline().DataFactory",
+									"type": "Expression"
+								},
+								"Message": {
+									"value": "@activity('customer_copy_data').Error.Message",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Transaction_Failure_notification",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "transcation_copy_data",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "email_notification",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"PipelineName": {
+									"value": "@pipeline().Pipeline",
+									"type": "Expression"
+								},
+								"DataFactoryName": {
+									"value": "@pipeline().DataFactory",
+									"type": "Expression"
+								},
+								"Message": {
+									"value": "@activity('transcation_copy_data').Error.Message",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Pipeline_Sucess_notification",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "transcation_copy_data",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "email_notification",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"PipelineName": {
+									"value": "@pipeline().Pipeline",
+									"type": "Expression"
+								},
+								"DataFactoryName": {
+									"value": "@pipeline().DataFactory",
+									"type": "Expression"
+								},
+								"Message": "Pipeline Successfully completed. "
 							}
 						}
 					}
 				],
-				"annotations": [],
-				"lastPublishTime": "2020-10-05T06:54:24Z"
+				"folder": {
+					"name": "Demo"
+				},
+				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/dataflow1')]",
-				"[concat(variables('factoryId'), '/linkedServices/stage_plybase')]"
+				"[concat(variables('factoryId'), '/datasets/customer_blob_input')]",
+				"[concat(variables('factoryId'), '/datasets/datalake_output')]",
+				"[concat(variables('factoryId'), '/pipelines/email_notification')]"
 			]
 		}
 	]

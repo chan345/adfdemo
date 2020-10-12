@@ -5,6 +5,9 @@
 		"factoryName": {
 			"value": "chandraadf123"
 		},
+		"AzureDataLakeStorage_accountKey": {
+			"value": ""
+		},
 		"AzureSynapseAnalytics_connectionString": {
 			"value": ""
 		},
@@ -19,6 +22,9 @@
 		},
 		"stage_plybase_connectionString": {
 			"value": ""
+		},
+		"AzureDataLakeStorage_properties_typeProperties_url": {
+			"value": "https://datalake234.dfs.core.windows.net"
 		},
 		"SqlServer_on_premises_properties_typeProperties_userName": {
 			"value": "HAPPIESTMINDS\\Chandra.babu"

@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "chandraadf123"
 		},
+		"AzureDataLakeStorage_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage'"
+		},
 		"AzureSynapseAnalytics_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureSynapseAnalytics'"
@@ -26,6 +30,10 @@
 		"stage_plybase_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'stage_plybase'"
+		},
+		"AzureDataLakeStorage_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://datalake234.dfs.core.windows.net"
 		},
 		"SqlServer_on_premises_properties_typeProperties_userName": {
 			"type": "string",
@@ -58,6 +66,9 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"AzureDataLakeStorage_accountKey": {
+						"value": "[parameters('AzureDataLakeStorage_accountKey')]"
+					},
 					"AzureSynapseAnalytics_connectionString": {
 						"value": "[parameters('AzureSynapseAnalytics_connectionString')]"
 					},
@@ -72,6 +83,9 @@
 					},
 					"SqlServer_on_premises_password": {
 						"value": "[parameters('SqlServer_on_premises_password')]"
+					},
+					"AzureDataLakeStorage_properties_typeProperties_url": {
+						"value": "[parameters('AzureDataLakeStorage_properties_typeProperties_url')]"
 					},
 					"SqlServer_on_premises_properties_typeProperties_userName": {
 						"value": "[parameters('SqlServer_on_premises_properties_typeProperties_userName')]"
