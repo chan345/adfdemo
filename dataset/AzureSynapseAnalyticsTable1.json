@@ -9,6 +9,11 @@
 		"type": "AzureSqlDWTable",
 		"schema": [
 			{
+				"name": "D_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
 				"name": "customer_Id",
 				"type": "int",
 				"precision": 10
@@ -28,22 +33,6 @@
 			{
 				"name": "Customer_Name",
 				"type": "varchar"
-			},
-			{
-				"name": "active_flag",
-				"type": "varchar"
-			},
-			{
-				"name": "efective_start_date",
-				"type": "datetime",
-				"precision": 23,
-				"scale": 3
-			},
-			{
-				"name": "efective_end_date",
-				"type": "datetime",
-				"precision": 23,
-				"scale": 3
 			},
 			{
 				"name": "last_updated_date",
