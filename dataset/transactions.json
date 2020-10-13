@@ -55,13 +55,13 @@
 				"name": "Tax",
 				"type": "decimal",
 				"precision": 12,
-				"scale": 9
+				"scale": 2
 			},
 			{
 				"name": "total_amt",
 				"type": "decimal",
 				"precision": 12,
-				"scale": 9
+				"scale": 2
 			},
 			{
 				"name": "Store_type",
