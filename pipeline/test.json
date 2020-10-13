@@ -1,5 +1,5 @@
 {
-	"name": "pipeline_transaction_dataflow",
+	"name": "test",
 	"properties": {
 		"activities": [
 			{
@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "transacation_dataflow",
+						"referenceName": "test_transacation_dataflow",
 						"type": "DataFlowReference"
 					},
 					"staging": {

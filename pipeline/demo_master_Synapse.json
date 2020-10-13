@@ -1,0 +1,205 @@
+{
+	"name": "demo_master_Synapse",
+	"properties": {
+		"activities": [
+			{
+				"name": "pipeline_customer_dataflow",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Synapse _master_flow_start",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pipeline_customer_dataflow",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "pipeline_transaction",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "pipeline_customer_dataflow",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pipeline_transaction",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "customer_email_Failure_notification",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "pipeline_customer_dataflow",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "email_notification",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"PipelineName": {
+							"value": "@pipeline().Pipeline",
+							"type": "Expression"
+						},
+						"DataFactoryName": {
+							"value": "@pipeline().DataFactory",
+							"type": "Expression"
+						},
+						"Message": {
+							"value": "@activity('pipeline_customer_dataflow').Error.Message",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "trans_email_failure_notification",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "pipeline_transaction",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "email_notification",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"PipelineName": {
+							"value": "@pipeline().Pipeline",
+							"type": "Expression"
+						},
+						"DataFactoryName": {
+							"value": "@pipeline().DataFactory",
+							"type": "Expression"
+						},
+						"Message": {
+							"value": "@activity('pipeline_transaction').Error.Message",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Trans_email_Sucess_notification",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "pipeline_transaction",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "email_notification",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"PipelineName": {
+							"value": "@pipeline().Pipeline",
+							"type": "Expression"
+						},
+						"DataFactoryName": {
+							"value": "@pipeline().DataFactory",
+							"type": "Expression"
+						},
+						"Message": "Transaction data flow successfully completed. "
+					}
+				}
+			},
+			{
+				"name": "Customer_email_Sucess_notification",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "pipeline_customer_dataflow",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "email_notification",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"PipelineName": {
+							"value": "@pipeline().Pipeline",
+							"type": "Expression"
+						},
+						"DataFactoryName": {
+							"value": "@pipeline().DataFactory",
+							"type": "Expression"
+						},
+						"Message": "Customer data flow successfully completed. "
+					}
+				}
+			},
+			{
+				"name": "Synapse _master_flow_start",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "email_notification",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"PipelineName": {
+							"value": "@pipeline().Pipeline",
+							"type": "Expression"
+						},
+						"DataFactoryName": {
+							"value": "@pipeline().DataFactory",
+							"type": "Expression"
+						},
+						"Message": "Synapse master flow started"
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "Demo"
+		},
+		"annotations": []
+	}
+}
