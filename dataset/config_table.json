@@ -1,0 +1,36 @@
+{
+	"name": "config_table",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSynapseAnalytics",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlDWTable",
+		"schema": [
+			{
+				"name": "NO",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Src_Tab",
+				"type": "varchar"
+			},
+			{
+				"name": "Watermark_Column",
+				"type": "varchar"
+			},
+			{
+				"name": "Watermark_Value",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "config"
+		}
+	}
+}
