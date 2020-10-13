@@ -1,0 +1,78 @@
+{
+	"name": "on_premis_transaction",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SqlServer_on_premises",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "Transaction_key",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "customer_Key",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "customer_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "transaction_id",
+				"type": "varchar"
+			},
+			{
+				"name": "tran_date",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "prod_subcat_code",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "prod_cat_code",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Qty",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Rate",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Tax",
+				"type": "decimal",
+				"precision": 12,
+				"scale": 2
+			},
+			{
+				"name": "total_amt",
+				"type": "decimal",
+				"precision": 12,
+				"scale": 2
+			},
+			{
+				"name": "Store_type",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Transactions"
+		}
+	}
+}
