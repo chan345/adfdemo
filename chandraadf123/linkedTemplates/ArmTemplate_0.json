@@ -95,32 +95,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/test')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Append variable1",
-						"type": "AppendVariable",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "test",
-							"value": "a,b"
-						}
-					}
-				],
-				"variables": {
-					"test": {
-						"type": "Array"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorage')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -498,6 +472,51 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/sampleoutput')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "output"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/transactions')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -520,9 +539,13 @@
 						"precision": 10
 					},
 					{
-						"name": "transaction_id",
+						"name": "customer_id",
 						"type": "int",
 						"precision": 10
+					},
+					{
+						"name": "transaction_id",
+						"type": "varchar"
 					},
 					{
 						"name": "tran_date",
@@ -550,13 +573,15 @@
 					},
 					{
 						"name": "Tax",
-						"type": "int",
-						"precision": 10
+						"type": "decimal",
+						"precision": 12,
+						"scale": 2
 					},
 					{
 						"name": "total_amt",
-						"type": "int",
-						"precision": 10
+						"type": "decimal",
+						"precision": 12,
+						"scale": 2
 					},
 					{
 						"name": "Store_type",
@@ -1087,6 +1112,47 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/dataflow1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "demo"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "input_transaction",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "transactions",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "SurrogateKey1"
+						}
+					],
+					"script": "source(output(\n\t\ttransaction_id as string,\n\t\tcust_id as integer,\n\t\ttran_date as string,\n\t\tprod_subcat_code as integer,\n\t\tprod_cat_code as integer,\n\t\tQty as integer,\n\t\tRate as integer,\n\t\tTax as double,\n\t\ttotal_amt as double,\n\t\tStore_type as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source1\nsource1 keyGenerate(output(key_1 as long),\n\tstartAt: 1L) ~> SurrogateKey1\nSurrogateKey1 sink(input(\n\t\tTransaction_key as integer,\n\t\tcustomer_Key as integer,\n\t\tcustomer_id as integer,\n\t\ttransaction_id as string,\n\t\ttran_date as date,\n\t\tprod_subcat_code as integer,\n\t\tprod_cat_code as integer,\n\t\tQty as integer,\n\t\tRate as integer,\n\t\tTax as decimal(12,2),\n\t\ttotal_amt as decimal(12,2),\n\t\tStore_type as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tmapColumn(\n\t\tcustomer_id = cust_id,\n\t\tTransaction_key = key_1,\n\t\ttransaction_id,\n\t\tprod_subcat_code,\n\t\tprod_cat_code,\n\t\tQty,\n\t\tRate,\n\t\tTax,\n\t\ttotal_amt,\n\t\tStore_type\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/input_transaction')]",
+				"[concat(variables('factoryId'), '/datasets/transactions')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/transacation_dataflow')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -1139,14 +1205,14 @@
 								"referenceName": "transactions",
 								"type": "DatasetReference"
 							},
-							"name": "transaction"
+							"name": "transactionUPDATEflow"
 						},
 						{
 							"dataset": {
 								"referenceName": "transactions",
 								"type": "DatasetReference"
 							},
-							"name": "sink1"
+							"name": "transactionInsertFlow"
 						}
 					],
 					"transformations": [
@@ -1181,135 +1247,13 @@
 							"name": "DerivedColumn1"
 						}
 					],
-					"script": "source(output(\n\t\ttransaction_id as long,\n\t\tcust_id as integer,\n\t\ttran_date as string,\n\t\tprod_subcat_code as short,\n\t\tprod_cat_code as short,\n\t\tQty as short,\n\t\tRate as short,\n\t\tTax as double,\n\t\ttotal_amt as double,\n\t\tStore_type as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tlimit: 0) ~> Transacation\nsource(output(\n\t\tD_KEY as integer,\n\t\tcustomer_Id as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'select D_KEY,customer_Id from D_customer',\n\tformat: 'query',\n\tstaged: false) ~> lkpcustomer\nsource(output(\n\t\tSrc_Tab as string,\n\t\tWatermark_Value as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'select [Src_Tab],[Watermark_Value] from config',\n\tformat: 'query',\n\tstaged: false) ~> incremental\nsource(output(\n\t\tmax_Transaction_key as integer,\n\t\tout_key as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: '\\nselect max(Transaction_key) as max_Transaction_key,\\'1\\' as out_key from Transactions\\n',\n\tformat: 'query',\n\tstaged: false) ~> maxsurgatekey\nsource(output(\n\t\tTransaction_key as integer,\n\t\tcustomer_Key as integer,\n\t\ttransaction_id as integer,\n\t\ttran_date as date,\n\t\tprod_subcat_code as integer,\n\t\tprod_cat_code as integer,\n\t\tQty as integer,\n\t\tRate as integer,\n\t\tTax as integer,\n\t\ttotal_amt as integer,\n\t\tStore_type as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> lkptransaction\nTransacation derive(tran_date = toTimestamp(tran_date,'dd-MM-yyyy'),\n\t\tsource_tablename = 'Transactions',\n\t\tinput_key = '1') ~> datatypechange\nincrementaljoin, lkpcustomer lookup(cust_id == customer_Id,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookupcustomer\ndatatypechange, incremental join(source_tablename == Src_Tab,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> incrementaljoin\nLookupcustomer filter(tran_date > Watermark_Value) ~> Filterdata\nFilterdata, lkptransaction exists(Transacation@transaction_id == lkptransaction@transaction_id,\n\tnegate:false,\n\tbroadcast: 'auto')~> updateflow\nupdateflow alterRow(updateIf(true())) ~> AlterRow1\nFilterdata, lkptransaction exists(Transacation@transaction_id == lkptransaction@transaction_id,\n\tnegate:true,\n\tbroadcast: 'auto')~> insertflow\ninsertflow, maxsurgatekey lookup(input_key == out_key,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookup1\nLookup1 keyGenerate(output(surgate_key as long),\n\tstartAt: 1L) ~> SurrogateKey1\nSurrogateKey1 derive(out_surgatekey = max_Transaction_key + surgate_key) ~> DerivedColumn1\nAlterRow1 sink(input(\n\t\tTransaction_key as integer,\n\t\tcustomer_Key as integer,\n\t\ttransaction_id as integer,\n\t\ttran_date as date,\n\t\tprod_subcat_code as integer,\n\t\tprod_cat_code as integer,\n\t\tQty as integer,\n\t\tRate as integer,\n\t\tTax as integer,\n\t\ttotal_amt as integer,\n\t\tStore_type as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:true,\n\tupsertable:false,\n\tkeys:['transaction_id'],\n\tformat: 'table',\n\tstaged: true,\n\tpostSQLs:['update config set [Watermark_Value]= (select max(tran_date) from Transactions)'],\n\tmapColumn(\n\t\ttransaction_id,\n\t\ttran_date,\n\t\tprod_subcat_code,\n\t\tprod_cat_code,\n\t\tQty,\n\t\tRate,\n\t\tTax,\n\t\ttotal_amt,\n\t\tStore_type\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> transaction\nDerivedColumn1 sink(input(\n\t\tTransaction_key as integer,\n\t\tcustomer_Key as integer,\n\t\ttransaction_id as integer,\n\t\ttran_date as date,\n\t\tprod_subcat_code as integer,\n\t\tprod_cat_code as integer,\n\t\tQty as integer,\n\t\tRate as integer,\n\t\tTax as integer,\n\t\ttotal_amt as integer,\n\t\tStore_type as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tmapColumn(\n\t\tTransaction_key = out_surgatekey,\n\t\tcustomer_Key = D_KEY,\n\t\ttransaction_id,\n\t\ttran_date,\n\t\tprod_subcat_code,\n\t\tprod_cat_code,\n\t\tQty,\n\t\tRate,\n\t\tTax,\n\t\ttotal_amt,\n\t\tStore_type\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1"
+					"script": "source(output(\n\t\ttransaction_id as string,\n\t\tcust_id as integer,\n\t\ttran_date as string,\n\t\tprod_subcat_code as integer,\n\t\tprod_cat_code as integer,\n\t\tQty as integer,\n\t\tRate as integer,\n\t\tTax as double,\n\t\ttotal_amt as double,\n\t\tStore_type as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tlimit: 0) ~> Transacation\nsource(output(\n\t\tD_KEY as integer,\n\t\tcustomer_Id as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'select D_KEY,customer_Id from D_customer',\n\tformat: 'query',\n\tstaged: false) ~> lkpcustomer\nsource(output(\n\t\tSrc_Tab as string,\n\t\tWatermark_Value as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'select [Src_Tab],[Watermark_Value] from config',\n\tformat: 'query',\n\tstaged: false) ~> incremental\nsource(output(\n\t\tmax_Transaction_key as integer,\n\t\tout_key as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: '\\nselect max(Transaction_key) as max_Transaction_key,\\'1\\' as out_key from Transactions\\n',\n\tformat: 'query',\n\tstaged: false) ~> maxsurgatekey\nsource(output(\n\t\tTransaction_key as integer,\n\t\tcustomer_Key as integer,\n\t\tcustomer_id as integer,\n\t\ttransaction_id as string,\n\t\ttran_date as date,\n\t\tprod_subcat_code as integer,\n\t\tprod_cat_code as integer,\n\t\tQty as integer,\n\t\tRate as integer,\n\t\tTax as decimal(12,9),\n\t\ttotal_amt as decimal(12,9),\n\t\tStore_type as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> lkptransaction\nTransacation derive(tran_date = toTimestamp(tran_date,'dd-MM-yyyy'),\n\t\tsource_tablename = 'Transactions',\n\t\tinput_key = '1') ~> datatypechange\nincrementaljoin, lkpcustomer lookup(cust_id == customer_Id,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookupcustomer\ndatatypechange, incremental join(source_tablename == Src_Tab,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> incrementaljoin\nLookupcustomer filter(tran_date > Watermark_Value) ~> Filterdata\nFilterdata, lkptransaction exists(Transacation@transaction_id == lkptransaction@transaction_id,\n\tnegate:false,\n\tbroadcast: 'auto')~> updateflow\nupdateflow alterRow(updateIf(true())) ~> AlterRow1\nFilterdata, lkptransaction exists(Transacation@transaction_id == lkptransaction@transaction_id,\n\tnegate:true,\n\tbroadcast: 'auto')~> insertflow\ninsertflow, maxsurgatekey lookup(input_key == out_key,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookup1\nLookup1 keyGenerate(output(surgate_key as long),\n\tstartAt: 1L) ~> SurrogateKey1\nSurrogateKey1 derive(out_surgatekey = max_Transaction_key + surgate_key) ~> DerivedColumn1\nAlterRow1 sink(input(\n\t\tTransaction_key as integer,\n\t\tcustomer_Key as integer,\n\t\tcustomer_id as integer,\n\t\ttransaction_id as string,\n\t\ttran_date as date,\n\t\tprod_subcat_code as integer,\n\t\tprod_cat_code as integer,\n\t\tQty as integer,\n\t\tRate as integer,\n\t\tTax as decimal(12,2),\n\t\ttotal_amt as decimal(12,2),\n\t\tStore_type as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:true,\n\tupsertable:false,\n\tkeys:['transaction_id'],\n\tformat: 'table',\n\tstaged: true,\n\tpostSQLs:['update config set [Watermark_Value]= (select max(tran_date) from Transactions)'],\n\tmapColumn(\n\t\ttransaction_id,\n\t\ttran_date,\n\t\tprod_subcat_code,\n\t\tprod_cat_code,\n\t\tQty,\n\t\tRate,\n\t\tTax,\n\t\ttotal_amt,\n\t\tStore_type\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tsaveOrder: 2) ~> transactionUPDATEflow\nDerivedColumn1 sink(input(\n\t\tTransaction_key as integer,\n\t\tcustomer_Key as integer,\n\t\tcustomer_id as integer,\n\t\ttransaction_id as string,\n\t\ttran_date as date,\n\t\tprod_subcat_code as integer,\n\t\tprod_cat_code as integer,\n\t\tQty as integer,\n\t\tRate as integer,\n\t\tTax as decimal(12,2),\n\t\ttotal_amt as decimal(12,2),\n\t\tStore_type as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tmapColumn(\n\t\ttransaction_id = out_surgatekey,\n\t\tcustomer_Key = D_KEY,\n\t\tcustomer_id = cust_id,\n\t\ttran_date,\n\t\tprod_subcat_code,\n\t\tprod_cat_code,\n\t\tQty,\n\t\tRate,\n\t\tTax,\n\t\ttotal_amt,\n\t\tStore_type,\n\t\ttransaction_id\n\t),\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tsaveOrder: 1) ~> transactionInsertFlow"
 				}
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/input_transaction')]",
 				"[concat(variables('factoryId'), '/datasets/AzureSynapseAnalyticsTable1')]",
 				"[concat(variables('factoryId'), '/datasets/transactions')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pipeline_customer_dataflow')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "customerdataflow",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "customerdataflow",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"inputcustomer": {},
-									"dcustomer": {},
-									"maxsurgarekey": {},
-									"incremental": {},
-									"updatecustomer": {},
-									"insertcustomer": {}
-								}
-							},
-							"staging": {
-								"linkedService": {
-									"referenceName": "stage_plybase",
-									"type": "LinkedServiceReference"
-								},
-								"folderPath": "stage"
-							},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							}
-						}
-					},
-					{
-						"name": "Sucess_email_notification",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "customerdataflow",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "email_notification",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"PipelineName": {
-									"value": "@pipeline().Pipeline",
-									"type": "Expression"
-								},
-								"DataFactoryName": {
-									"value": "@pipeline().DataFactory",
-									"type": "Expression"
-								},
-								"Message": "Pipeline successfully completed."
-							}
-						}
-					},
-					{
-						"name": "Failure_email_notification",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "customerdataflow",
-								"dependencyConditions": [
-									"Failed"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "email_notification",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"PipelineName": {
-									"value": "@pipeline().Pipeline",
-									"type": "Expression"
-								},
-								"DataFactoryName": {
-									"value": "@pipeline().DataFactory",
-									"type": "Expression"
-								},
-								"Message": {
-									"value": "@activity('customerdataflow').Error.Message",
-									"type": "Expression"
-								}
-							}
-						}
-					}
-				],
-				"folder": {
-					"name": "Demo"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/customerdataflow')]",
-				"[concat(variables('factoryId'), '/linkedServices/stage_plybase')]",
-				"[concat(variables('factoryId'), '/pipelines/email_notification')]"
 			]
 		}
 	]
