@@ -33,35 +33,27 @@
 			},
 			{
 				"name": "prod_subcat_code",
-				"type": "int",
-				"precision": 10
+				"type": "varchar"
 			},
 			{
 				"name": "prod_cat_code",
-				"type": "int",
-				"precision": 10
+				"type": "varchar"
 			},
 			{
 				"name": "Qty",
-				"type": "int",
-				"precision": 10
+				"type": "varchar"
 			},
 			{
 				"name": "Rate",
-				"type": "int",
-				"precision": 10
+				"type": "varchar"
 			},
 			{
 				"name": "Tax",
-				"type": "decimal",
-				"precision": 12,
-				"scale": 9
+				"type": "varchar"
 			},
 			{
 				"name": "total_amt",
-				"type": "decimal",
-				"precision": 12,
-				"scale": 9
+				"type": "varchar"
 			},
 			{
 				"name": "Store_type",
