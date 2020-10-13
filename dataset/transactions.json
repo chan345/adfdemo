@@ -53,13 +53,15 @@
 			},
 			{
 				"name": "Tax",
-				"type": "int",
-				"precision": 10
+				"type": "decimal",
+				"precision": 12,
+				"scale": 9
 			},
 			{
 				"name": "total_amt",
-				"type": "int",
-				"precision": 10
+				"type": "decimal",
+				"precision": 12,
+				"scale": 9
 			},
 			{
 				"name": "Store_type",
