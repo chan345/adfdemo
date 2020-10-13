@@ -1,9 +1,9 @@
 {
-	"name": "test",
+	"name": "pipeline_transaction_dataflow",
 	"properties": {
 		"activities": [
 			{
-				"name": "dataflow1",
+				"name": "transacation_dataflow",
 				"type": "ExecuteDataFlow",
 				"dependsOn": [],
 				"policy": {
@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "dataflow1",
+						"referenceName": "transacation_dataflow",
 						"type": "DataFlowReference"
 					},
 					"staging": {
@@ -33,10 +33,8 @@
 				}
 			}
 		],
-		"variables": {
-			"test": {
-				"type": "Array"
-			}
+		"folder": {
+			"name": "Demo"
 		},
 		"annotations": []
 	}
