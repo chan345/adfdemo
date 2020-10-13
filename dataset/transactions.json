@@ -19,6 +19,11 @@
 				"precision": 10
 			},
 			{
+				"name": "customer_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
 				"name": "transaction_id",
 				"type": "int",
 				"precision": 10
