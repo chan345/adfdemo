@@ -13,7 +13,7 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/customerdataflow')]",
+			"name": "[concat(parameters('factoryName'), '/dataflow_customer')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -225,7 +225,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"dataflow": {
-								"referenceName": "customerdataflow",
+								"referenceName": "dataflow_customer",
 								"type": "DataFlowReference",
 								"parameters": {},
 								"datasetParameters": {
@@ -257,7 +257,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/customerdataflow')]"
+				"[concat(variables('factoryId'), '/dataflows/dataflow_customer')]"
 			]
 		},
 		{
