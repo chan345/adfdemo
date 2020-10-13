@@ -56,13 +56,86 @@
 								"computeType": "General"
 							}
 						}
-					},
+					}
+				],
+				"folder": {
+					"name": "Demo"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline_transaction')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
 					{
-						"name": "Sucess_email_notification",
+						"name": "transaction_data",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "dataflow_transaction",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"sourcetransaction": {},
+									"lkptrans": {},
+									"lkpcustomer": {},
+									"maxsurgagekey": {},
+									"lkpincremental": {},
+									"INSERTtransaction": {},
+									"UPDATEtransaction": {}
+								}
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "stage_plybase",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "stage"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
+					}
+				],
+				"variables": {
+					"test": {
+						"type": "Array"
+					}
+				},
+				"folder": {
+					"name": "Demo"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/demo_master_Synapse')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "pipeline_customer_dataflow",
 						"type": "ExecutePipeline",
 						"dependsOn": [
 							{
-								"activity": "customerdataflow",
+								"activity": "Synapse _master_flow_start",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -71,29 +144,40 @@
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
-								"referenceName": "email_notification",
+								"referenceName": "pipeline_customer_dataflow",
 								"type": "PipelineReference"
 							},
 							"waitOnCompletion": true,
-							"parameters": {
-								"PipelineName": {
-									"value": "@pipeline().Pipeline",
-									"type": "Expression"
-								},
-								"DataFactoryName": {
-									"value": "@pipeline().DataFactory",
-									"type": "Expression"
-								},
-								"Message": "Pipeline successfully completed."
-							}
+							"parameters": {}
 						}
 					},
 					{
-						"name": "Failure_email_notification",
+						"name": "pipeline_transaction",
 						"type": "ExecutePipeline",
 						"dependsOn": [
 							{
-								"activity": "customerdataflow",
+								"activity": "pipeline_customer_dataflow",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pipeline_transaction",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "customer_email_Failure_notification",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "pipeline_customer_dataflow",
 								"dependencyConditions": [
 									"Failed"
 								]
@@ -116,63 +200,129 @@
 									"type": "Expression"
 								},
 								"Message": {
-									"value": "@activity('customerdataflow').Error.Message",
+									"value": "@activity('pipeline_customer_dataflow').Error.Message",
 									"type": "Expression"
 								}
 							}
 						}
-					}
-				],
-				"folder": {
-					"name": "Demo"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pipeline_transaction_dataflow')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
+					},
 					{
-						"name": "transacation_dataflow",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
+						"name": "trans_email_failure_notification",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "pipeline_transaction",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
 						"userProperties": [],
 						"typeProperties": {
-							"dataflow": {
-								"referenceName": "transacation_dataflow",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"Transacation": {},
-									"lkpcustomer": {},
-									"incremental": {},
-									"maxsurgatekey": {},
-									"lkptransaction": {},
-									"transactionUPDATEflow": {},
-									"transactionInsertFlow": {}
-								}
+							"pipeline": {
+								"referenceName": "email_notification",
+								"type": "PipelineReference"
 							},
-							"staging": {
-								"linkedService": {
-									"referenceName": "stage_plybase",
-									"type": "LinkedServiceReference"
+							"waitOnCompletion": true,
+							"parameters": {
+								"PipelineName": {
+									"value": "@pipeline().Pipeline",
+									"type": "Expression"
 								},
-								"folderPath": "stage"
+								"DataFactoryName": {
+									"value": "@pipeline().DataFactory",
+									"type": "Expression"
+								},
+								"Message": {
+									"value": "@activity('pipeline_transaction').Error.Message",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Trans_email_Sucess_notification",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "pipeline_transaction",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "email_notification",
+								"type": "PipelineReference"
 							},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
+							"waitOnCompletion": true,
+							"parameters": {
+								"PipelineName": {
+									"value": "@pipeline().Pipeline",
+									"type": "Expression"
+								},
+								"DataFactoryName": {
+									"value": "@pipeline().DataFactory",
+									"type": "Expression"
+								},
+								"Message": "Transaction data flow successfully completed. "
+							}
+						}
+					},
+					{
+						"name": "Customer_email_Sucess_notification",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "pipeline_customer_dataflow",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "email_notification",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"PipelineName": {
+									"value": "@pipeline().Pipeline",
+									"type": "Expression"
+								},
+								"DataFactoryName": {
+									"value": "@pipeline().DataFactory",
+									"type": "Expression"
+								},
+								"Message": "Customer data flow successfully completed. "
+							}
+						}
+					},
+					{
+						"name": "Synapse _master_flow_start",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "email_notification",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"PipelineName": {
+									"value": "@pipeline().Pipeline",
+									"type": "Expression"
+								},
+								"DataFactoryName": {
+									"value": "@pipeline().DataFactory",
+									"type": "Expression"
+								},
+								"Message": "Synapse master flow started"
 							}
 						}
 					}
@@ -182,58 +332,10 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/test')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "dataflow1",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "dataflow1",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"source1": {},
-									"sink1": {}
-								}
-							},
-							"staging": {
-								"linkedService": {
-									"referenceName": "stage_plybase",
-									"type": "LinkedServiceReference"
-								},
-								"folderPath": "stage"
-							},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							}
-						}
-					}
-				],
-				"variables": {
-					"test": {
-						"type": "Array"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pipeline_customer_dataflow')]",
+				"[concat(variables('factoryId'), '/pipelines/pipeline_transaction')]"
+			]
 		}
 	]
 }
