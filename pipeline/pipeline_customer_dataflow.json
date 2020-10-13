@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "customerdataflow",
+						"referenceName": "dataflow_customer",
 						"type": "DataFlowReference"
 					},
 					"staging": {

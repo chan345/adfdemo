@@ -1,5 +1,5 @@
 {
-	"name": "customerdataflow",
+	"name": "dataflow_customer",
 	"properties": {
 		"folder": {
 			"name": "demo"
