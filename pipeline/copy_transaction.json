@@ -1,0 +1,206 @@
+{
+	"name": "copy_transaction",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "SqlServerSink"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "trans_key",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "trans_key",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "cust_key",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cust_key",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "cust_id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cust_id",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "transaction_id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "transaction_id",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "tran_date",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "tran_date",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "prod_subcat_code",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "prod_subcat_code",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "prod_cat_code",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "prod_cat_code",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Qty",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Qty",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Rate",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Rate",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Tax",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Tax",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "total_amt",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "total_amt",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Store_type",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Store_type",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "blob_files",
+						"type": "DatasetReference",
+						"parameters": {
+							"filename": "trans_synape.csv"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "on_premis_transaction",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"annotations": []
+	}
+}
