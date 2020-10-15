@@ -1,0 +1,35 @@
+{
+	"name": "dataflow_product_category",
+	"properties": {
+		"folder": {
+			"name": "demo"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "product_category_DL2",
+						"type": "DatasetReference"
+					},
+					"name": "productcategory"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "product_category_synape",
+						"type": "DatasetReference"
+					},
+					"name": "targetproductcategory"
+				}
+			],
+			"transformations": [
+				{
+					"name": "AlterRow1"
+				}
+			],
+			"script": "source(output(\n\t\tprod_cat_code as integer,\n\t\tprod_cat as string,\n\t\tprod_sub_cat_code as integer,\n\t\tprod_subcat as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> productcategory\nproductcategory alterRow(upsertIf(true())) ~> AlterRow1\nAlterRow1 sink(input(\n\t\tprod_cat_code as integer,\n\t\tprod_category_Name as string,\n\t\tprod_sub_cat_code as integer,\n\t\tprod_subcategory as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['prod_cat_code','prod_sub_cat_code'],\n\tformat: 'table',\n\tstaged: true,\n\tmapColumn(\n\t\tprod_cat_code,\n\t\tprod_category_Name = prod_cat,\n\t\tprod_sub_cat_code,\n\t\tprod_subcategory = prod_subcat\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> targetproductcategory"
+		}
+	}
+}

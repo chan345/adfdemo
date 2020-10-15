@@ -195,6 +195,94 @@
 						"Message": "Synapse master flow started"
 					}
 				}
+			},
+			{
+				"name": "pipeline_product_category",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Trans_email_Sucess_notification",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pipeline_product_category",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "product_category_Failure_notification",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "pipeline_product_category",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "email_notification",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"PipelineName": {
+							"value": "@pipeline().Pipeline",
+							"type": "Expression"
+						},
+						"DataFactoryName": {
+							"value": "@pipeline().DataFactory",
+							"type": "Expression"
+						},
+						"Message": {
+							"value": "@activity('pipeline_product_category').Error.Message",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Product_category_Sucess_email_notification",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "pipeline_product_category",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "email_notification",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"PipelineName": {
+							"value": "@pipeline().Pipeline",
+							"type": "Expression"
+						},
+						"DataFactoryName": {
+							"value": "@pipeline().DataFactory",
+							"type": "Expression"
+						},
+						"Message": {
+							"value": "Product category Sucessfully completed",
+							"type": "Expression"
+						}
+					}
+				}
 			}
 		],
 		"folder": {
