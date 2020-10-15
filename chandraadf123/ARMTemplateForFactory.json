@@ -621,7 +621,9 @@
 							{
 								"referenceName": "datalake_output",
 								"type": "DatasetReference",
-								"parameters": {}
+								"parameters": {
+									"target_filename": "Customer.csv"
+								}
 							}
 						]
 					},
@@ -689,7 +691,9 @@
 							{
 								"referenceName": "datalake_output",
 								"type": "DatasetReference",
-								"parameters": {}
+								"parameters": {
+									"target_filename": "Transactions.csv"
+								}
 							}
 						]
 					},
@@ -766,7 +770,7 @@
 						"type": "ExecutePipeline",
 						"dependsOn": [
 							{
-								"activity": "transcation_copy_data",
+								"activity": "Product_Category_Subcategory",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -789,6 +793,110 @@
 									"type": "Expression"
 								},
 								"Message": "Pipeline Successfully completed. "
+							}
+						}
+					},
+					{
+						"name": "Product_Category_Subcategory",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "transcation_copy_data",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "customer_blob_input",
+								"type": "DatasetReference",
+								"parameters": {
+									"filename": "Product_Category_Subcategory.csv"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "datalake_output",
+								"type": "DatasetReference",
+								"parameters": {
+									"target_filename": "Product_Category_Subcategory.csv"
+								}
+							}
+						]
+					},
+					{
+						"name": "product_category_Failure_notification",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Product_Category_Subcategory",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "email_notification",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"PipelineName": {
+									"value": "@pipeline().Pipeline",
+									"type": "Expression"
+								},
+								"DataFactoryName": {
+									"value": "@pipeline().DataFactory",
+									"type": "Expression"
+								},
+								"Message": {
+									"value": "@activity('Product_Category_Subcategory').Error.Message",
+									"type": "Expression"
+								}
 							}
 						}
 					}
@@ -1418,7 +1526,7 @@
 					},
 					"columnDelimiter": ",",
 					"escapeChar": "\\",
-					"firstRowAsHeader": false,
+					"firstRowAsHeader": true,
 					"quoteChar": "\""
 				},
 				"schema": [
@@ -1454,6 +1562,67 @@
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/datalake_output')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"target_filename": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().target_filename",
+							"type": "Expression"
+						},
+						"fileSystem": "output"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "customer_Id",
+						"type": "String"
+					},
+					{
+						"name": "DOB",
+						"type": "String"
+					},
+					{
+						"name": "Gender",
+						"type": "String"
+					},
+					{
+						"name": "city_code",
+						"type": "String"
+					},
+					{
+						"name": "Customer_Name",
+						"type": "String"
+					},
+					{
+						"name": "Created_Modified_Date",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/input_customer_DL2')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -1940,7 +2109,7 @@
 					"sources": [
 						{
 							"dataset": {
-								"referenceName": "datalake_output",
+								"referenceName": "input_customer_DL2",
 								"type": "DatasetReference"
 							},
 							"name": "inputcustomer"
@@ -2019,7 +2188,7 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/datalake_output')]",
+				"[concat(variables('factoryId'), '/datasets/input_customer_DL2')]",
 				"[concat(variables('factoryId'), '/datasets/AzureSynapseAnalyticsTable1')]"
 			]
 		},
