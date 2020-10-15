@@ -1,0 +1,35 @@
+{
+	"name": "product_category_SQLDB",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sqldb",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "prod_cat_code",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "prod_category_Name",
+				"type": "varchar"
+			},
+			{
+				"name": "prod_sub_cat_code",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "prod_subcategory",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "product_category"
+		}
+	}
+}
