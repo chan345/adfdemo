@@ -5,12 +5,20 @@
 			"referenceName": "AzureDataLakeStorage",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"target_filename": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "Customer.csv",
+				"fileName": {
+					"value": "@dataset().target_filename",
+					"type": "Expression"
+				},
 				"fileSystem": "output"
 			},
 			"columnDelimiter": ",",
