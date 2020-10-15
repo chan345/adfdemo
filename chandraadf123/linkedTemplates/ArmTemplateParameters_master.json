@@ -20,6 +20,9 @@
 		"blob_input_connectionString": {
 			"value": ""
 		},
+		"sqldb_connectionString": {
+			"value": ""
+		},
 		"stage_plybase_connectionString": {
 			"value": ""
 		},

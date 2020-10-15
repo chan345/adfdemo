@@ -27,6 +27,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'blob_input'"
 		},
+		"sqldb_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'sqldb'"
+		},
 		"stage_plybase_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'stage_plybase'"
@@ -75,20 +79,14 @@
 					"blob_input_connectionString": {
 						"value": "[parameters('blob_input_connectionString')]"
 					},
+					"sqldb_connectionString": {
+						"value": "[parameters('sqldb_connectionString')]"
+					},
 					"stage_plybase_connectionString": {
 						"value": "[parameters('stage_plybase_connectionString')]"
 					},
-					"SqlServer_on_premises_connectionString": {
-						"value": "[parameters('SqlServer_on_premises_connectionString')]"
-					},
-					"SqlServer_on_premises_password": {
-						"value": "[parameters('SqlServer_on_premises_password')]"
-					},
 					"AzureDataLakeStorage_properties_typeProperties_url": {
 						"value": "[parameters('AzureDataLakeStorage_properties_typeProperties_url')]"
-					},
-					"SqlServer_on_premises_properties_typeProperties_userName": {
-						"value": "[parameters('SqlServer_on_premises_properties_typeProperties_userName')]"
 					}
 				}
 			},
@@ -107,6 +105,15 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"SqlServer_on_premises_connectionString": {
+						"value": "[parameters('SqlServer_on_premises_connectionString')]"
+					},
+					"SqlServer_on_premises_password": {
+						"value": "[parameters('SqlServer_on_premises_password')]"
+					},
+					"SqlServer_on_premises_properties_typeProperties_userName": {
+						"value": "[parameters('SqlServer_on_premises_properties_typeProperties_userName')]"
 					}
 				}
 			},
