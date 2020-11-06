@@ -1,0 +1,29 @@
+{
+	"name": "WranglingDataFlow1",
+	"properties": {
+		"type": "WranglingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"name": "input_blob_cust",
+					"script": "",
+					"dataset": {
+						"referenceName": "input_blob_cust",
+						"type": "DatasetReference"
+					}
+				}
+			],
+			"sinks": [
+				{
+					"name": "Sink1",
+					"dataset": {
+						"referenceName": "datalake_output",
+						"type": "DatasetReference"
+					},
+					"script": "sink(input(\n\t\tcustomer_Id as string,\n\t\tDOB as string,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tCreated_Modified_Date as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Sink1"
+				}
+			],
+			"script": "section Section1;\r\nshared input_blob_cust = let\r\n  AdfDoc = AzureStorage.BlobContents(\"https://chandrablobstorage1.blob.core.windows.net/input/Customer.csv\"),\r\n  Csv = Csv.Document(AdfDoc, [Delimiter = \",\", Encoding = TextEncoding.Utf8, QuoteStyle = QuoteStyle.Csv])\r\nin\r\n  Csv;\r\nshared UserQuery = let\r\n  Source = input_blob_cust,\r\n  #\"Removed columns\" = Table.RemoveColumns(Source, {\"Column6\"})\r\nin\r\n  #\"Removed columns\";\r\n"
+		}
+	}
+}
