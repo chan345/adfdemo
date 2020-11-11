@@ -22,7 +22,7 @@
 				}
 			],
 			"transformations": [],
-			"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: '',\n\tformat: 'query',\n\tpartitionBy('external', 2)) ~> source1\nsource1 sink(input(\n\t\td_key as string,\n\t\tcustomer_Id as string,\n\t\tDOB as string,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tlast_updated_date as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1"
+			"script": "source(output(\n\t\td_key as string,\n\t\tcustomer_Id as string,\n\t\tDOB as string,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tlast_updated_date as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> source1\nsource1 sink(input(\n\t\td_key as string,\n\t\tcustomer_Id as string,\n\t\tDOB as string,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tlast_updated_date as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1"
 		}
 	}
 }
