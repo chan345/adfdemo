@@ -10,6 +10,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "emp"
+				},
+				{
+					"dataset": {
+						"referenceName": "dept_blob",
+						"type": "DatasetReference"
+					},
+					"name": "dept"
 				}
 			],
 			"sinks": [
@@ -21,8 +28,21 @@
 					"name": "emptarget"
 				}
 			],
-			"transformations": [],
-			"script": "parameters{\n\tdataflow_paramater as string\n}\nsource(output(\n\t\tEMP_ID as integer,\n\t\tNAME as string,\n\t\tSALARY as integer,\n\t\tDEPT_ID as integer,\n\t\tLOC as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> emp\nemp sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:[($dataflow_paramater)],\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tsaveOrder: 1) ~> emptarget"
+			"transformations": [
+				{
+					"name": "Join1"
+				},
+				{
+					"name": "Filter"
+				},
+				{
+					"name": "DerivedColumn1"
+				},
+				{
+					"name": "Select1"
+				}
+			],
+			"script": "parameters{\n\tdataflow_paramater as string\n}\nsource(output(\n\t\tEMP_ID as integer,\n\t\tNAME as string,\n\t\tSALARY as integer,\n\t\tDEPT_ID as integer,\n\t\tLOC as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> emp\nsource(output(\n\t\tDept_id as integer,\n\t\tdept_name as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> dept\nDerivedColumn1, Select1 join(emp@DEPT_ID == Select1@dept_id,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Join1\ndept filter(Dept_id > 0) ~> Filter\nemp derive(k1 = 'kk') ~> DerivedColumn1\nDerivedColumn1 select(mapColumn(\n\t\tdept_id = DEPT_ID,\n\t\tNAME\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nJoin1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:[($dataflow_paramater)],\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tsaveOrder: 1) ~> emptarget"
 		}
 	}
 }
