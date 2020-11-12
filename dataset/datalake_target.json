@@ -6,9 +6,8 @@
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"target_filename": {
-				"type": "string",
-				"defaultValue": "check"
+			"directry": {
+				"type": "string"
 			}
 		},
 		"annotations": [],
@@ -16,8 +15,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": {
-					"value": "@dataset().target_filename",
+				"folderPath": {
+					"value": "@dataset().directry",
 					"type": "Expression"
 				},
 				"fileSystem": "output"

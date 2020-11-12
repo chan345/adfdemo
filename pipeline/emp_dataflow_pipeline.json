@@ -1,0 +1,56 @@
+{
+	"name": "emp_dataflow_pipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "emp_example",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "emp_example",
+						"type": "DataFlowReference",
+						"parameters": {
+							"dataflow_paramater": {
+								"value": "'@{pipeline().parameters.tgt_file}'",
+								"type": "Expression"
+							}
+						},
+						"datasetParameters": {
+							"emptarget": {
+								"directry": {
+									"value": "@pipeline().parameters.directry_pipene",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"parameters": {
+			"tgt_file": {
+				"type": "string",
+				"defaultValue": "emp.txt"
+			},
+			"directry_pipene": {
+				"type": "string",
+				"defaultValue": "file"
+			}
+		},
+		"annotations": []
+	}
+}
