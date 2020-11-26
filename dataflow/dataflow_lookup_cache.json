@@ -1,5 +1,5 @@
 {
-	"name": "dataflow1",
+	"name": "dataflow_lookup_cache",
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
@@ -17,15 +17,36 @@
 						"type": "DatasetReference"
 					},
 					"name": "source2"
+				},
+				{
+					"dataset": {
+						"referenceName": "test_blob",
+						"type": "DatasetReference"
+					},
+					"name": "source3"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"name": "sink1"
+				},
+				{
+					"dataset": {
+						"referenceName": "datalake_target",
+						"type": "DatasetReference"
+					},
+					"name": "sink2"
+				}
+			],
 			"transformations": [
 				{
 					"name": "Lookup1"
+				},
+				{
+					"name": "DerivedColumn1"
 				}
 			],
-			"script": "source(output(\n\t\tEMP_ID as string,\n\t\tNAME as string,\n\t\tSALARY as string,\n\t\tDEPT_ID as string,\n\t\tLOC as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source1\nsource(output(\n\t\tDept_id as string,\n\t\tdept_name as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source2\nsource1, source2 lookup(source1@DEPT_ID == source2@Dept_id,\n\tmultiple: false,\n\tpickup: 'first',\n\tasc(source2@Dept_id, true),\n\tbroadcast: 'auto')~> Lookup1"
+			"script": "source(output(\n\t\tEMP_ID as string,\n\t\tNAME as string,\n\t\tSALARY as string,\n\t\tDEPT_ID as string,\n\t\tLOC as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source1\nsource(output(\n\t\tDept_id as string,\n\t\tdept_name as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source2\nsource(output(\n\t\tID as short,\n\t\tLOC as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source3\nsource1, source2 lookup(source1@DEPT_ID != source2@Dept_id,\n\tmultiple: false,\n\tpickup: 'first',\n\tasc(dept_name, true),\n\tbroadcast: 'right')~> Lookup1\nsource3 derive(cached_value = sink1#outputs()[1].NAME) ~> DerivedColumn1\nLookup1 sink(skipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tstore: 'cache',\n\tformat: 'inline',\n\tsaveOrder: 1) ~> sink1\nDerivedColumn1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['cache_lookup.txt'],\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink2"
 		}
 	}
 }
