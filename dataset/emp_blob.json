@@ -18,27 +18,6 @@
 			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
-		"schema": [
-			{
-				"name": "EMP_ID",
-				"type": "String"
-			},
-			{
-				"name": "NAME",
-				"type": "String"
-			},
-			{
-				"name": "SALARY",
-				"type": "String"
-			},
-			{
-				"name": "DEPT_ID",
-				"type": "String"
-			},
-			{
-				"name": "LOC",
-				"type": "String"
-			}
-		]
+		"schema": []
 	}
 }
