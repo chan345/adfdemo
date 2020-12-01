@@ -15,13 +15,10 @@
 			"sinks": [],
 			"transformations": [
 				{
-					"name": "DerivedColumn1"
-				},
-				{
 					"name": "Select1"
 				}
 			],
-			"script": "parameters{\n\tdetect_col as string[] (['SALARY','EMP_ID'])\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source1\nSelect1 derive(each(match(), ERROR_FUNCTION('') = ERROR_FUNCTION(''))) ~> DerivedColumn1\nsource1 select(mapColumn(\n\t\teach(match(name=='EMP_ID'))\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1"
+			"script": "parameters{\n\tdetect_col as string[] (['SALARY','EMP_ID'])\n}\nsource(output(\n\t\tEMP_ID as short,\n\t\tNAME as string,\n\t\tSALARY as short,\n\t\tDEPT_ID as short,\n\t\tLOC as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source1\nsource1 select(skipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1"
 		}
 	}
 }
