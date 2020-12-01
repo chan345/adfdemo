@@ -16,9 +16,12 @@
 			"transformations": [
 				{
 					"name": "Select1"
+				},
+				{
+					"name": "DerivedColumn1"
 				}
 			],
-			"script": "parameters{\n\tdetect_col as string[] (['SALARY','EMP_ID'])\n}\nsource(output(\n\t\tEMP_ID as short,\n\t\tNAME as string,\n\t\tSALARY as short,\n\t\tDEPT_ID as short,\n\t\tLOC as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source1\nsource1 select(skipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1"
+			"script": "parameters{\n\tdetect_col as string[] (['SALARY','EMP_ID'])\n}\nsource(output(\n\t\tEMP_ID as short,\n\t\tNAME as string,\n\t\tSALARY as short,\n\t\tDEPT_ID as short,\n\t\tLOC as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source1\nsource1 select(skipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nSelect1 derive(each(match(type=='short'), $$ = toInteger($$)),\n\t\teach(match(type=='string'), $$ = trim($$)),\n\t\tcolumn_1 = EMP_ID +SALARY,\n\t\tcolumn2 = :default_value,\n\t\tdefault_value := 'reserved') ~> DerivedColumn1"
 		}
 	}
 }
