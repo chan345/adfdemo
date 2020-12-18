@@ -10,9 +10,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "country1.txt",
-				"folderPath": "subdirectory",
-				"fileSystem": "input"
+				"fileName": "jsontocsv.txt",
+				"fileSystem": "output"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",

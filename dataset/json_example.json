@@ -10,8 +10,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "test.json",
-				"fileSystem": "output"
+				"fileName": "example_2.json",
+				"fileSystem": "input"
 			}
 		},
 		"schema": {
