@@ -20,15 +20,30 @@
 		},
 		"schema": [
 			{
-				"name": "id",
 				"type": "String"
 			},
 			{
-				"name": "name",
 				"type": "String"
 			},
 			{
-				"name": "country",
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
 				"type": "String"
 			}
 		]
