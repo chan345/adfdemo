@@ -17,65 +17,60 @@
 		"schema": {
 			"type": "object",
 			"properties": {
-				"quiz": {
+				"glossary": {
 					"type": "object",
 					"properties": {
-						"sport": {
-							"type": "object",
-							"properties": {
-								"q1": {
-									"type": "object",
-									"properties": {
-										"question": {
-											"type": "string"
-										},
-										"options": {
-											"type": "array",
-											"items": {
-												"type": "string"
-											}
-										},
-										"answer": {
-											"type": "string"
-										}
-									}
-								}
-							}
+						"title": {
+							"type": "string"
 						},
-						"maths": {
+						"GlossDiv": {
 							"type": "object",
 							"properties": {
-								"q1": {
-									"type": "object",
-									"properties": {
-										"question": {
-											"type": "string"
-										},
-										"options": {
-											"type": "array",
-											"items": {
-												"type": "string"
-											}
-										},
-										"answer": {
-											"type": "string"
-										}
-									}
+								"title": {
+									"type": "string"
 								},
-								"q2": {
+								"GlossList": {
 									"type": "object",
 									"properties": {
-										"question": {
-											"type": "string"
-										},
-										"options": {
-											"type": "array",
-											"items": {
-												"type": "string"
+										"GlossEntry": {
+											"type": "object",
+											"properties": {
+												"ID": {
+													"type": "string"
+												},
+												"SortAs": {
+													"type": "string"
+												},
+												"GlossTerm": {
+													"type": "string"
+												},
+												"Acronym": {
+													"type": "array",
+													"items": {
+														"type": "string"
+													}
+												},
+												"Abbrev": {
+													"type": "string"
+												},
+												"GlossDef": {
+													"type": "object",
+													"properties": {
+														"para": {
+															"type": "string"
+														},
+														"GlossSeeAlso": {
+															"type": "array",
+															"items": {
+																"type": "string"
+															}
+														}
+													}
+												},
+												"GlossSee": {
+													"type": "string"
+												}
 											}
-										},
-										"answer": {
-											"type": "string"
 										}
 									}
 								}

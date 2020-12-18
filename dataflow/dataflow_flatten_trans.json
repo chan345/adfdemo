@@ -1,0 +1,24 @@
+{
+	"name": "dataflow_flatten_trans",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "json_example",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "Flatten1"
+				}
+			],
+			"script": "source(output(\n\t\tglossary as (title as string, GlossDiv as (title as string, GlossList as (GlossEntry as (ID as string, SortAs as string, GlossTerm as string, Acronym as string[], Abbrev as string, GlossDef as (para as string, GlossSeeAlso as string[]), GlossSee as string))))\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tdocumentForm: 'singleDocument') ~> source1\nsource1 foldDown(unroll(glossary.GlossDiv.GlossList.GlossEntry.GlossDef.GlossSeeAlso),\n\tmapColumn(\n\t\tglossary\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> Flatten1"
+		}
+	}
+}
