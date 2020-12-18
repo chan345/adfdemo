@@ -8,6 +8,9 @@
 		"AzureDataLakeStorage_accountKey": {
 			"value": ""
 		},
+		"AzureDataLakeStorage1_accountKey": {
+			"value": ""
+		},
 		"AzureSqlDatabase_connectionString": {
 			"value": ""
 		},
@@ -29,20 +32,17 @@
 		"stage_plybase_connectionString": {
 			"value": ""
 		},
-		"AzureDataLakeStorage1_accountKey": {
-			"value": ""
-		},
 		"AzureDataLakeStorage_properties_typeProperties_url": {
 			"value": "https://datalakegn21.dfs.core.windows.net"
 		},
-		"SqlServer_on_premises_properties_typeProperties_userName": {
-			"value": "HAPPIESTMINDS\\Chandra.babu"
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"value": "https://datalake099.dfs.core.windows.net"
 		},
 		"AzureKeyVault1_properties_typeProperties_baseUrl": {
 			"value": "https://keyvalutlake.vault.azure.net/"
 		},
-		"AzureDataLakeStorage1_properties_typeProperties_url": {
-			"value": "https://datalake099.dfs.core.windows.net"
+		"SqlServer_on_premises_properties_typeProperties_userName": {
+			"value": "HAPPIESTMINDS\\Chandra.babu"
 		},
 		"containerUri": {
 			"value": ""
