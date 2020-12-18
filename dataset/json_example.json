@@ -45,6 +45,23 @@
 							}
 						}
 					}
+				},
+				"contact": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"pincode": {
+								"type": "string"
+							},
+							"mobile": {
+								"type": "string"
+							},
+							"phone": {
+								"type": "string"
+							}
+						}
+					}
 				}
 			}
 		}
