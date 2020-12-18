@@ -43,38 +43,57 @@
 						"mappings": [
 							{
 								"source": {
-									"path": "$['menu']['id']"
-								},
-								"sink": {
-									"ordinal": 1
+									"path": "$['glossary']['title']"
 								}
 							},
 							{
 								"source": {
-									"path": "$['menu']['value']"
-								},
-								"sink": {
-									"ordinal": 2
+									"path": "$['glossary']['GlossDiv']['title']"
 								}
 							},
 							{
 								"source": {
-									"path": "['value']"
-								},
-								"sink": {
-									"ordinal": 3
+									"path": "$['glossary']['GlossDiv']['GlossList']['GlossEntry']['ID']"
 								}
 							},
 							{
 								"source": {
-									"path": "['onclick']"
-								},
-								"sink": {
-									"ordinal": 4
+									"path": "$['glossary']['GlossDiv']['GlossList']['GlossEntry']['SortAs']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['glossary']['GlossDiv']['GlossList']['GlossEntry']['GlossTerm']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['glossary']['GlossDiv']['GlossList']['GlossEntry']['Acronym']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['glossary']['GlossDiv']['GlossList']['GlossEntry']['Abbrev']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['glossary']['GlossDiv']['GlossList']['GlossEntry']['GlossDef']['para']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['glossary']['GlossDiv']['GlossList']['GlossEntry']['GlossDef']['GlossSeeAlso'][0]"
+								}
+							},
+							{
+								"source": {
+									"path": "$['glossary']['GlossDiv']['GlossList']['GlossEntry']['GlossSee']"
 								}
 							}
 						],
-						"collectionReference": "$['menu']['popup']['menuitem']"
+						"collectionReference": "$['menu']['popup']['menuitem']",
+						"mapComplexValuesToString": true
 					}
 				},
 				"inputs": [
