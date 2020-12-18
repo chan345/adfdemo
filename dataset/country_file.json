@@ -13,9 +13,9 @@
 				"fileName": "jsontocsv.txt",
 				"fileSystem": "output"
 			},
-			"columnDelimiter": ",",
+			"columnDelimiter": "|",
 			"escapeChar": "\\",
-			"firstRowAsHeader": true,
+			"firstRowAsHeader": false,
 			"quoteChar": "\""
 		},
 		"schema": [
