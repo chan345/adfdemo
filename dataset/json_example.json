@@ -17,63 +17,31 @@
 		"schema": {
 			"type": "object",
 			"properties": {
-				"glossary": {
-					"type": "object",
-					"properties": {
-						"title": {
-							"type": "string"
-						},
-						"GlossDiv": {
-							"type": "object",
-							"properties": {
-								"title": {
-									"type": "string"
-								},
-								"GlossList": {
-									"type": "object",
-									"properties": {
-										"GlossEntry": {
-											"type": "object",
-											"properties": {
-												"ID": {
-													"type": "string"
-												},
-												"SortAs": {
-													"type": "string"
-												},
-												"GlossTerm": {
-													"type": "string"
-												},
-												"Acronym": {
-													"type": "array",
-													"items": {
-														"type": "string"
-													}
-												},
-												"Abbrev": {
-													"type": "string"
-												},
-												"GlossDef": {
-													"type": "object",
-													"properties": {
-														"para": {
-															"type": "string"
-														},
-														"GlossSeeAlso": {
-															"type": "array",
-															"items": {
-																"type": "string"
-															}
-														}
-													}
-												},
-												"GlossSee": {
-													"type": "string"
-												}
-											}
-										}
-									}
-								}
+				"Name": {
+					"type": "string"
+				},
+				"title": {
+					"type": "string"
+				},
+				"product": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"Address": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"loc": {
+								"type": "string"
+							},
+							"state": {
+								"type": "string"
+							},
+							"country": {
+								"type": "string"
 							}
 						}
 					}
