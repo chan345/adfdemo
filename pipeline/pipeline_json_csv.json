@@ -40,6 +40,81 @@
 					"enableStaging": false,
 					"translator": {
 						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['glossary']['title']"
+								},
+								"sink": {
+									"ordinal": 1
+								}
+							},
+							{
+								"source": {
+									"path": "$['glossary']['GlossDiv']['title']"
+								},
+								"sink": {
+									"ordinal": 2
+								}
+							},
+							{
+								"source": {
+									"path": "$['glossary']['GlossDiv']['GlossList']['GlossEntry']['ID']"
+								},
+								"sink": {
+									"ordinal": 3
+								}
+							},
+							{
+								"source": {
+									"path": "$['glossary']['GlossDiv']['GlossList']['GlossEntry']['SortAs']"
+								},
+								"sink": {
+									"ordinal": 4
+								}
+							},
+							{
+								"source": {
+									"path": "$['glossary']['GlossDiv']['GlossList']['GlossEntry']['GlossTerm']"
+								},
+								"sink": {
+									"ordinal": 5
+								}
+							},
+							{
+								"source": {
+									"path": "$['glossary']['GlossDiv']['GlossList']['GlossEntry']['Acronym']"
+								},
+								"sink": {
+									"ordinal": 6
+								}
+							},
+							{
+								"source": {
+									"path": "$['glossary']['GlossDiv']['GlossList']['GlossEntry']['Abbrev']"
+								},
+								"sink": {
+									"ordinal": 7
+								}
+							},
+							{
+								"source": {
+									"path": "$['glossary']['GlossDiv']['GlossList']['GlossEntry']['GlossDef']['para']"
+								},
+								"sink": {
+									"ordinal": 8
+								}
+							},
+							{
+								"source": {
+									"path": "$['glossary']['GlossDiv']['GlossList']['GlossEntry']['GlossSee']"
+								},
+								"sink": {
+									"ordinal": 9
+								}
+							}
+						],
+						"collectionReference": "$['glossary']['GlossDiv']['GlossList']['GlossEntry']['GlossDef']['GlossSeeAlso']",
 						"mapComplexValuesToString": false
 					}
 				},
