@@ -107,15 +107,23 @@
 							},
 							{
 								"source": {
-									"path": "$['glossary']['GlossDiv']['GlossList']['GlossEntry']['GlossSee']"
+									"path": "$['glossary']['GlossDiv']['GlossList']['GlossEntry']['GlossDef']['GlossSeeAlso']"
 								},
 								"sink": {
 									"ordinal": 9
 								}
+							},
+							{
+								"source": {
+									"path": "$['glossary']['GlossDiv']['GlossList']['GlossEntry']['GlossSee']"
+								},
+								"sink": {
+									"ordinal": 10
+								}
 							}
 						],
-						"collectionReference": "$['glossary']['GlossDiv']['GlossList']['GlossEntry']['GlossDef']['GlossSeeAlso']",
-						"mapComplexValuesToString": false
+						"collectionReference": "",
+						"mapComplexValuesToString": true
 					}
 				},
 				"inputs": [
