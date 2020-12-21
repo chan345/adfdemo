@@ -3,8 +3,31 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Copy data1",
-				"type": "Copy",
+				"name": "Filter1",
+				"type": "Filter",
+				"dependsOn": [
+					{
+						"activity": "Get Metadata1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get Metadata1').output.childitems",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@startswith(item().name,'c')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Get Metadata1",
+				"type": "GetMetadata",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "7.00:00:00",
@@ -15,190 +38,21 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"source": {
-						"type": "DelimitedTextSource",
-						"storeSettings": {
-							"type": "AzureBlobStorageReadSettings",
-							"recursive": true
-						},
-						"formatSettings": {
-							"type": "DelimitedTextReadSettings"
-						}
-					},
-					"sink": {
-						"type": "SqlServerSink"
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"name": "trans_key",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "trans_key",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "cust_key",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "cust_key",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "cust_id",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "cust_id",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "transaction_id",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "transaction_id",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "tran_date",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "tran_date",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "prod_subcat_code",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "prod_subcat_code",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "prod_cat_code",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "prod_cat_code",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "Qty",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "Qty",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "Rate",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "Rate",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "Tax",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "Tax",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "total_amt",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "total_amt",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "Store_type",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "Store_type",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							}
-						],
-						"typeConversion": true,
-						"typeConversionSettings": {
-							"allowDataTruncation": true,
-							"treatBooleanAsNumber": false
-						}
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "blob_files",
-						"type": "DatasetReference",
-						"parameters": {
-							"filename": "trans_synape.csv"
-						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "on_premis_transaction",
+					"dataset": {
+						"referenceName": "wiley_input",
 						"type": "DatasetReference"
+					},
+					"fieldList": [
+						"childItems"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
 					}
-				]
+				}
 			}
 		],
 		"annotations": []
