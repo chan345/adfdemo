@@ -1,0 +1,311 @@
+{
+    "name": "Workshot_table_incremental",
+    "properties": {
+        "activities": [
+            {
+                "name": "Lookup_Config",
+                "type": "Lookup",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "AzureSqlSource",
+                        "sqlReaderQuery": "select * from dbo.config where Load_Flag='1'",
+                        "queryTimeout": "02:00:00",
+                        "partitionOption": "None"
+                    },
+                    "dataset": {
+                        "referenceName": "AzureSqlTable",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "sqldb_tablename": "config",
+                            "schema_name": "dbo"
+                        }
+                    },
+                    "firstRowOnly": false
+                }
+            },
+            {
+                "name": "Filter1",
+                "type": "Filter",
+                "dependsOn": [
+                    {
+                        "activity": "Lookup_Config",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "items": {
+                        "value": "@activity('Lookup_Config').output.value",
+                        "type": "Expression"
+                    },
+                    "condition": {
+                        "value": "@equals(item().Src_Name,'Tables')",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "ForEach1",
+                "type": "ForEach",
+                "dependsOn": [
+                    {
+                        "activity": "Filter1",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "items": {
+                        "value": "@activity('Filter1').output.value",
+                        "type": "Expression"
+                    },
+                    "isSequential": true,
+                    "activities": [
+                        {
+                            "name": "Copy data1",
+                            "type": "Copy",
+                            "dependsOn": [],
+                            "policy": {
+                                "timeout": "7.00:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "source": {
+                                    "type": "AzureSqlSource",
+                                    "sqlReaderStoredProcedureName": "[dbo].[incremental_sp]",
+                                    "storedProcedureParameters": {
+                                        "incr_colum": {
+                                            "type": "String",
+                                            "value": {
+                                                "value": "@item().Watermark_Column",
+                                                "type": "Expression"
+                                            }
+                                        },
+                                        "incr_table": {
+                                            "type": "String",
+                                            "value": {
+                                                "value": "@item().Src_Tab",
+                                                "type": "Expression"
+                                            }
+                                        }
+                                    },
+                                    "queryTimeout": "02:00:00",
+                                    "partitionOption": "None"
+                                },
+                                "sink": {
+                                    "type": "DelimitedTextSink",
+                                    "storeSettings": {
+                                        "type": "AzureBlobFSWriteSettings"
+                                    },
+                                    "formatSettings": {
+                                        "type": "DelimitedTextWriteSettings",
+                                        "quoteAllText": true,
+                                        "fileExtension": ".csv"
+                                    }
+                                },
+                                "enableStaging": false,
+                                "translator": {
+                                    "type": "TabularTranslator",
+                                    "typeConversion": true,
+                                    "typeConversionSettings": {
+                                        "allowDataTruncation": true,
+                                        "treatBooleanAsNumber": false
+                                    }
+                                }
+                            },
+                            "inputs": [
+                                {
+                                    "referenceName": "AzureSqlTable",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "sqldb_tablename": {
+                                            "value": "emp",
+                                            "type": "Expression"
+                                        },
+                                        "schema_name": "dbo"
+                                    }
+                                }
+                            ],
+                            "outputs": [
+                                {
+                                    "referenceName": "datalakeg2_csv",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "filesystem": "inputfiles",
+                                        "directory": "output",
+                                        "filename": {
+                                            "value": "@concat(item().Src_Tab,'_' ,formatDateTime(utcnow(),'yyyy-MM-ddTHH:mm:ss'),'.csv')",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Stored procedure1",
+                            "type": "SqlServerStoredProcedure",
+                            "dependsOn": [
+                                {
+                                    "activity": "Copy data1",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "7.00:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "storedProcedureName": "[dbo].[update_watermark_value_sp]",
+                                "storedProcedureParameters": {
+                                    "incr_colum": {
+                                        "value": {
+                                            "value": "@item().Watermark_Column",
+                                            "type": "Expression"
+                                        },
+                                        "type": "String"
+                                    },
+                                    "incr_table": {
+                                        "value": {
+                                            "value": "@item().Src_Tab",
+                                            "type": "Expression"
+                                        },
+                                        "type": "String"
+                                    }
+                                }
+                            },
+                            "linkedServiceName": {
+                                "referenceName": "AzureSqlDatabase",
+                                "type": "LinkedServiceReference"
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "Execute Pipeline_Sucess",
+                "type": "ExecutePipeline",
+                "dependsOn": [
+                    {
+                        "activity": "ForEach1",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "pipeline": {
+                        "referenceName": "Sucess_email",
+                        "type": "PipelineReference"
+                    },
+                    "waitOnCompletion": true,
+                    "parameters": {
+                        "PipelineName": {
+                            "value": "@pipeline().Pipeline",
+                            "type": "Expression"
+                        },
+                        "DataFactoryName": {
+                            "value": "@pipeline().DataFactory",
+                            "type": "Expression"
+                        },
+                        "ErrorMessage": "sucessfully eompleted"
+                    }
+                }
+            },
+            {
+                "name": "Execute Pipeline_Failled",
+                "type": "ExecutePipeline",
+                "dependsOn": [
+                    {
+                        "activity": "Lookup_Config",
+                        "dependencyConditions": [
+                            "Failed"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "pipeline": {
+                        "referenceName": "Sucess_email",
+                        "type": "PipelineReference"
+                    },
+                    "waitOnCompletion": true,
+                    "parameters": {
+                        "PipelineName": {
+                            "value": "@pipeline().Pipeline",
+                            "type": "Expression"
+                        },
+                        "DataFactoryName": {
+                            "value": "@pipeline().DataFactory",
+                            "type": "Expression"
+                        },
+                        "ErrorMessage": {
+                            "value": "@activity('Lookup_Config').Error.Message",
+                            "type": "Expression"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "Execute Pipeline_Failled_copy1",
+                "type": "ExecutePipeline",
+                "dependsOn": [
+                    {
+                        "activity": "Filter1",
+                        "dependencyConditions": [
+                            "Failed"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "pipeline": {
+                        "referenceName": "Sucess_email",
+                        "type": "PipelineReference"
+                    },
+                    "waitOnCompletion": true,
+                    "parameters": {
+                        "PipelineName": {
+                            "value": "@pipeline().Pipeline",
+                            "type": "Expression"
+                        },
+                        "DataFactoryName": {
+                            "value": "@pipeline().DataFactory",
+                            "type": "Expression"
+                        },
+                        "ErrorMessage": {
+                            "value": "@activity('Filter1').Error.Message",
+                            "type": "Expression"
+                        }
+                    }
+                }
+            }
+        ],
+        "annotations": [],
+        "lastPublishTime": "2020-09-24T07:33:28Z"
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}

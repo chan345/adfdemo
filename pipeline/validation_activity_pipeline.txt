@@ -1,0 +1,131 @@
+{
+    "name": "Validation_activity",
+    "properties": {
+        "activities": [
+            {
+                "name": "Validation1",
+                "type": "Validation",
+                "dependsOn": [],
+                "userProperties": [],
+                "typeProperties": {
+                    "dataset": {
+                        "referenceName": "default_input_blob",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "filename": "validation.txt"
+                        }
+                    },
+                    "timeout": "0.00:00:10",
+                    "sleep": 5
+                }
+            },
+            {
+                "name": "Copy data1",
+                "type": "Copy",
+                "dependsOn": [
+                    {
+                        "activity": "Validation1",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "DelimitedTextSource",
+                        "storeSettings": {
+                            "type": "AzureBlobStorageReadSettings",
+                            "recursive": true
+                        },
+                        "formatSettings": {
+                            "type": "DelimitedTextReadSettings"
+                        }
+                    },
+                    "sink": {
+                        "type": "DelimitedTextSink",
+                        "storeSettings": {
+                            "type": "AzureBlobFSWriteSettings"
+                        },
+                        "formatSettings": {
+                            "type": "DelimitedTextWriteSettings",
+                            "quoteAllText": true,
+                            "fileExtension": ".txt"
+                        }
+                    },
+                    "enableStaging": false,
+                    "translator": {
+                        "type": "TabularTranslator",
+                        "typeConversion": true,
+                        "typeConversionSettings": {
+                            "allowDataTruncation": true,
+                            "treatBooleanAsNumber": false
+                        }
+                    }
+                },
+                "inputs": [
+                    {
+                        "referenceName": "default_input_blob",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "filename": "validation.txt"
+                        }
+                    }
+                ],
+                "outputs": [
+                    {
+                        "referenceName": "datalakeg2_csv",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "filesystem": "inputfiles",
+                            "directory": "level2",
+                            "filename": "validation.txt"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "Fail_email",
+                "type": "ExecutePipeline",
+                "dependsOn": [
+                    {
+                        "activity": "Validation1",
+                        "dependencyConditions": [
+                            "Failed"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "pipeline": {
+                        "referenceName": "Sucess_email",
+                        "type": "PipelineReference"
+                    },
+                    "waitOnCompletion": true,
+                    "parameters": {
+                        "PipelineName": {
+                            "value": "@pipeline().Pipeline",
+                            "type": "Expression"
+                        },
+                        "DataFactoryName": {
+                            "value": "@pipeline().DataFactory",
+                            "type": "Expression"
+                        },
+                        "ErrorMessage": {
+                            "value": "@activity('Validation1').Output.exists",
+                            "type": "Expression"
+                        }
+                    }
+                }
+            }
+        ],
+        "annotations": []
+    }
+}

@@ -1,0 +1,101 @@
+{
+    "name": "incremental_flatfile",
+    "properties": {
+        "activities": [
+            {
+                "name": "Copy data1",
+                "type": "Copy",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "DelimitedTextSource",
+                        "storeSettings": {
+                            "type": "AzureBlobStorageReadSettings",
+                            "recursive": true,
+                            "modifiedDatetimeStart": {
+                                "value": "@pipeline().parameters.start_date",
+                                "type": "Expression"
+                            },
+                            "modifiedDatetimeEnd": {
+                                "value": "@pipeline().parameters.end_date",
+                                "type": "Expression"
+                            },
+                            "wildcardFolderPath": "/",
+                            "wildcardFileName": "*.txt"
+                        },
+                        "formatSettings": {
+                            "type": "DelimitedTextReadSettings"
+                        }
+                    },
+                    "sink": {
+                        "type": "DelimitedTextSink",
+                        "storeSettings": {
+                            "type": "AzureBlobFSWriteSettings"
+                        },
+                        "formatSettings": {
+                            "type": "DelimitedTextWriteSettings",
+                            "quoteAllText": true,
+                            "fileExtension": ".txt"
+                        }
+                    },
+                    "enableStaging": false,
+                    "translator": {
+                        "type": "TabularTranslator",
+                        "typeConversion": true,
+                        "typeConversionSettings": {
+                            "allowDataTruncation": true,
+                            "treatBooleanAsNumber": false
+                        }
+                    }
+                },
+                "inputs": [
+                    {
+                        "referenceName": "default_input_blob",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "filename": {
+                                "value": "*.txt",
+                                "type": "Expression"
+                            }
+                        }
+                    }
+                ],
+                "outputs": [
+                    {
+                        "referenceName": "default_output_GL2",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "T_filesystem": "inputfiles",
+                            "T_directory": "output"
+                        }
+                    }
+                ]
+            }
+        ],
+        "parameters": {
+            "start_date": {
+                "type": "string",
+                "defaultValue": "09/17/2020 07:30:00"
+            },
+            "end_date": {
+                "type": "string",
+                "defaultValue": "09/17/2020 07:30:00"
+            },
+            "filename": {
+                "type": "string",
+                "defaultValue": "*.txt"
+            }
+        },
+        "annotations": [],
+        "lastPublishTime": "2020-09-17T12:19:54Z"
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,153 @@
+{
+    "name": "GET_metadat_pipeline",
+    "properties": {
+        "activities": [
+            {
+                "name": "Get Metadata_example",
+                "description": "Get ",
+                "type": "GetMetadata",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "dataset": {
+                        "referenceName": "datalakeg2_csv",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "filesystem": "inputfiles",
+                            "directory": "country",
+                            "filename": {
+                                "value": "@pipeline().parameters.file",
+                                "type": "Expression"
+                            }
+                        }
+                    },
+                    "fieldList": [
+                        "lastModified"
+                    ],
+                    "storeSettings": {
+                        "type": "AzureBlobFSReadSettings",
+                        "recursive": true
+                    },
+                    "formatSettings": {
+                        "type": "DelimitedTextReadSettings"
+                    }
+                }
+            },
+            {
+                "name": "If Condition",
+                "description": "checking sysdate and last modified file stamp. if equal then procee data source to target",
+                "type": "IfCondition",
+                "dependsOn": [
+                    {
+                        "activity": "Get Metadata_example",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "expression": {
+                        "value": "@equals(formatDateTime(utcnow(),'yyyy-MM-dd'),\nformatDateTime(activity('Get Metadata_example').output.lastModified,'yyyy-MM-dd'))",
+                        "type": "Expression"
+                    },
+                    "ifTrueActivities": [
+                        {
+                            "name": "True",
+                            "type": "Copy",
+                            "dependsOn": [],
+                            "policy": {
+                                "timeout": "7.00:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [
+                                {
+                                    "name": "Test",
+                                    "value": "passed"
+                                }
+                            ],
+                            "typeProperties": {
+                                "source": {
+                                    "type": "DelimitedTextSource",
+                                    "storeSettings": {
+                                        "type": "AzureBlobFSReadSettings",
+                                        "recursive": true
+                                    },
+                                    "formatSettings": {
+                                        "type": "DelimitedTextReadSettings"
+                                    }
+                                },
+                                "sink": {
+                                    "type": "DelimitedTextSink",
+                                    "storeSettings": {
+                                        "type": "AzureBlobFSWriteSettings"
+                                    },
+                                    "formatSettings": {
+                                        "type": "DelimitedTextWriteSettings",
+                                        "quoteAllText": true,
+                                        "fileExtension": ".txt"
+                                    }
+                                },
+                                "enableStaging": false,
+                                "translator": {
+                                    "type": "TabularTranslator",
+                                    "typeConversion": true,
+                                    "typeConversionSettings": {
+                                        "allowDataTruncation": true,
+                                        "treatBooleanAsNumber": false
+                                    }
+                                }
+                            },
+                            "inputs": [
+                                {
+                                    "referenceName": "datalakeg2_csv",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "filesystem": "inputfiles",
+                                        "directory": "country",
+                                        "filename": {
+                                            "value": "@pipeline().parameters.file",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ],
+                            "outputs": [
+                                {
+                                    "referenceName": "datalakeg2_csv",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "filesystem": "inputfiles",
+                                        "directory": "level2",
+                                        "filename": {
+                                            "value": "@pipeline().parameters.file",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "parameters": {
+            "file": {
+                "type": "string"
+            }
+        },
+        "annotations": [],
+        "lastPublishTime": "2020-09-17T07:52:58Z"
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}

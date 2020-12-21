@@ -1,0 +1,172 @@
+{
+    "name": "sp_Error_handling",
+    "properties": {
+        "activities": [
+            {
+                "name": "Copy_sqldb_dlg2",
+                "type": "Copy",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "AzureSqlSource",
+                        "queryTimeout": "02:00:00",
+                        "partitionOption": "None"
+                    },
+                    "sink": {
+                        "type": "DelimitedTextSink",
+                        "storeSettings": {
+                            "type": "AzureBlobFSWriteSettings"
+                        },
+                        "formatSettings": {
+                            "type": "DelimitedTextWriteSettings",
+                            "quoteAllText": true,
+                            "fileExtension": ".txt"
+                        }
+                    },
+                    "enableStaging": false,
+                    "translator": {
+                        "type": "TabularTranslator",
+                        "mappings": [
+                            {
+                                "source": {
+                                    "name": "ID",
+                                    "type": "Int32",
+                                    "physicalType": "int"
+                                },
+                                "sink": {
+                                    "name": "ID",
+                                    "type": "Int32"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Name",
+                                    "type": "String",
+                                    "physicalType": "varchar"
+                                },
+                                "sink": {
+                                    "name": "Name",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Address",
+                                    "type": "String",
+                                    "physicalType": "varchar"
+                                },
+                                "sink": {
+                                    "name": "Address",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "DEPT_ID",
+                                    "type": "Int32",
+                                    "physicalType": "int"
+                                },
+                                "sink": {
+                                    "name": "DEPT_ID",
+                                    "type": "Int32"
+                                }
+                            }
+                        ],
+                        "typeConversion": true,
+                        "typeConversionSettings": {
+                            "allowDataTruncation": true,
+                            "treatBooleanAsNumber": false
+                        }
+                    }
+                },
+                "inputs": [
+                    {
+                        "referenceName": "AzureSqlTable",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "sqldb_tablename": "emp",
+                            "schema_name": "dbo"
+                        }
+                    }
+                ],
+                "outputs": [
+                    {
+                        "referenceName": "datalakeg2_csv",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "filesystem": "inputfiles",
+                            "directory": "level2",
+                            "filename": "abc.csv"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "Stored procedure1",
+                "type": "SqlServerStoredProcedure",
+                "dependsOn": [
+                    {
+                        "activity": "Copy_sqldb_dlg2",
+                        "dependencyConditions": [
+                            "Failed"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "storedProcedureName": "[dbo].[batch_process2]",
+                    "storedProcedureParameters": {
+                        "comment": {
+                            "value": {
+                                "value": "@activity('Copy_sqldb_dlg2').Error.message",
+                                "type": "Expression"
+                            },
+                            "type": "String"
+                        },
+                        "Pipeline": {
+                            "value": {
+                                "value": "@pipeline().Pipeline",
+                                "type": "Expression"
+                            },
+                            "type": "String"
+                        },
+                        "TriggerName": {
+                            "value": {
+                                "value": "@pipeline().TriggerName",
+                                "type": "Expression"
+                            },
+                            "type": "String"
+                        }
+                    }
+                },
+                "linkedServiceName": {
+                    "referenceName": "AzureSqlDatabase",
+                    "type": "LinkedServiceReference"
+                }
+            }
+        ],
+        "parameters": {
+            "tables": {
+                "type": "string"
+            }
+        },
+        "annotations": [],
+        "lastPublishTime": "2020-09-25T08:11:55Z"
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}

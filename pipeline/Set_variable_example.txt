@@ -1,0 +1,172 @@
+{
+    "name": "Set_variable_example",
+    "properties": {
+        "activities": [
+            {
+                "name": "Set variable1",
+                "type": "SetVariable",
+                "dependsOn": [],
+                "userProperties": [],
+                "typeProperties": {
+                    "variableName": "timestamp",
+                    "value": {
+                        "value": "@utcnow()",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "Copy emp1_copy1",
+                "type": "Copy",
+                "dependsOn": [
+                    {
+                        "activity": "Delete1",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [
+                    {
+                        "name": "Source",
+                        "value": "dbo.emp1"
+                    },
+                    {
+                        "name": "Destination",
+                        "value": "@{'inputfiles'}/@{'level2'}/@{'chan.txt'}"
+                    }
+                ],
+                "typeProperties": {
+                    "source": {
+                        "type": "AzureSqlSource",
+                        "queryTimeout": "02:00:00",
+                        "partitionOption": "None"
+                    },
+                    "sink": {
+                        "type": "DelimitedTextSink",
+                        "storeSettings": {
+                            "type": "AzureBlobFSWriteSettings"
+                        },
+                        "formatSettings": {
+                            "type": "DelimitedTextWriteSettings",
+                            "quoteAllText": true,
+                            "fileExtension": ".txt"
+                        }
+                    },
+                    "enableStaging": false,
+                    "translator": {
+                        "value": "@variables('variable1')",
+                        "type": "Expression"
+                    }
+                },
+                "inputs": [
+                    {
+                        "referenceName": "EMP_set_variable",
+                        "type": "DatasetReference"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "referenceName": "datalakeg2_csv",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "filesystem": "inputfiles",
+                            "directory": "level2",
+                            "filename": {
+                                "value": "@concat(variables('v_filename'),variables('timestamp'),variables('extension'))",
+                                "type": "Expression"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "Set variable1_copy1",
+                "type": "SetVariable",
+                "dependsOn": [],
+                "userProperties": [],
+                "typeProperties": {
+                    "variableName": "v_filename",
+                    "value": {
+                        "value": "@concat(pipeline().parameters.filename,'-')",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "Delete1",
+                "type": "Delete",
+                "dependsOn": [
+                    {
+                        "activity": "Set variable1_copy1",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "Set variable1",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "dataset": {
+                        "referenceName": "delete_data_store",
+                        "type": "DatasetReference"
+                    },
+                    "logStorageSettings": {
+                        "linkedServiceName": {
+                            "referenceName": "AzureDataLakeStorage2",
+                            "type": "LinkedServiceReference"
+                        },
+                        "path": "inputdata/ inputdataazcopy"
+                    },
+                    "enableLogging": true,
+                    "storeSettings": {
+                        "type": "AzureBlobFSReadSettings",
+                        "recursive": false
+                    }
+                }
+            }
+        ],
+        "parameters": {
+            "filename": {
+                "type": "string"
+            }
+        },
+        "variables": {
+            "variable1": {
+                "type": "String"
+            },
+            "v_filename": {
+                "type": "String"
+            },
+            "timestamp": {
+                "type": "String"
+            },
+            "extension": {
+                "type": "String",
+                "defaultValue": ".csv"
+            }
+        },
+        "annotations": [],
+        "lastPublishTime": "2020-09-14T10:22:39Z"
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}
