@@ -50,6 +50,15 @@
 		"Trigger_5qt_properties_pipeline_schedule_trigger_parameters_windowEnd": {
 			"value": "@trigger().scheduledTime"
 		},
+		"Trigger_x7l_properties_CopyPipeline_x7l_parameters_windowStart": {
+			"value": "@{adddays(trigger().scheduledTime, -1)}"
+		},
+		"Trigger_x7l_properties_CopyPipeline_x7l_parameters_windowEnd": {
+			"value": "@trigger().scheduledTime"
+		},
+		"trigger3_properties_pipeline1_parameters_start": {
+			"value": "trigger().scheduledtime"
+		},
 		"containerUri": {
 			"value": ""
 		},
