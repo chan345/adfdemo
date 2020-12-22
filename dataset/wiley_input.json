@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "uss.txt",
+				"folderPath": "test",
 				"fileSystem": "input"
 			},
 			"columnDelimiter": ",",
