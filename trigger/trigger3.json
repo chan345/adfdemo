@@ -8,6 +8,10 @@
 				"pipelineReference": {
 					"referenceName": "pipeline1",
 					"type": "PipelineReference"
+				},
+				"parameters": {
+					"start": "@{addminutes(trigger().scheduledtime,-3)}",
+					"end": "@trigger().scheduledtime"
 				}
 			}
 		],
@@ -15,7 +19,7 @@
 		"typeProperties": {
 			"recurrence": {
 				"frequency": "Minute",
-				"interval": 2,
+				"interval": 3,
 				"startTime": "2020-12-22T05:19:00Z",
 				"endTime": "2020-12-23T05:24:45Z",
 				"timeZone": "UTC"

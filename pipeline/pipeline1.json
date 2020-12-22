@@ -21,10 +21,13 @@
 							"type": "AzureBlobFSReadSettings",
 							"recursive": true,
 							"modifiedDatetimeStart": {
-								"value": "@pipeline().parameters.schedue",
+								"value": "@pipeline().parameters.start",
 								"type": "Expression"
 							},
-							"modifiedDatetimeEnd": "2020-12-23T00:00:00.000Z",
+							"modifiedDatetimeEnd": {
+								"value": "@pipeline().parameters.end",
+								"type": "Expression"
+							},
 							"wildcardFileName": "*",
 							"enablePartitionDiscovery": false
 						},
@@ -68,9 +71,11 @@
 			}
 		],
 		"parameters": {
-			"schedue": {
-				"type": "string",
-				"defaultValue": "@trigger().scheduledTime"
+			"start": {
+				"type": "string"
+			},
+			"end": {
+				"type": "string"
 			}
 		},
 		"annotations": []
