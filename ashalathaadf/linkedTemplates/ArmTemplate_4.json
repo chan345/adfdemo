@@ -22,6 +22,14 @@
 		"Trigger_5qt_properties_pipeline_schedule_trigger_parameters_windowEnd": {
 			"type": "string",
 			"defaultValue": "@trigger().scheduledTime"
+		},
+		"trigger4_properties_pipeline_parameters_start": {
+			"type": "string",
+			"defaultValue": "@trigger().outputs.windowStartTime"
+		},
+		"trigger4_properties_pipeline_parameters_end": {
+			"type": "string",
+			"defaultValue": "@trigger().outputs.windowEndTime"
 		}
 	},
 	"variables": {
@@ -358,7 +366,10 @@
 						"referenceName": "pipeline1",
 						"type": "PipelineReference"
 					},
-					"parameters": {}
+					"parameters": {
+						"start": "[parameters('trigger4_properties_pipeline_parameters_start')]",
+						"end": "[parameters('trigger4_properties_pipeline_parameters_end')]"
+					}
 				},
 				"type": "TumblingWindowTrigger",
 				"typeProperties": {

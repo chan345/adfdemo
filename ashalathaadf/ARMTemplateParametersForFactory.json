@@ -55,6 +55,12 @@
 		},
 		"Trigger_5qt_properties_pipeline_schedule_trigger_parameters_windowEnd": {
 			"value": "@trigger().scheduledTime"
+		},
+		"trigger4_properties_pipeline_parameters_start": {
+			"value": "@trigger().outputs.windowStartTime"
+		},
+		"trigger4_properties_pipeline_parameters_end": {
+			"value": "@trigger().outputs.windowEndTime"
 		}
 	}
 }

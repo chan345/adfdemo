@@ -75,6 +75,14 @@
 			"type": "string",
 			"defaultValue": "@trigger().scheduledTime"
 		},
+		"trigger4_properties_pipeline_parameters_start": {
+			"type": "string",
+			"defaultValue": "@trigger().outputs.windowStartTime"
+		},
+		"trigger4_properties_pipeline_parameters_end": {
+			"type": "string",
+			"defaultValue": "@trigger().outputs.windowEndTime"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -230,6 +238,12 @@
 					},
 					"Trigger_5qt_properties_pipeline_schedule_trigger_parameters_windowEnd": {
 						"value": "[parameters('Trigger_5qt_properties_pipeline_schedule_trigger_parameters_windowEnd')]"
+					},
+					"trigger4_properties_pipeline_parameters_start": {
+						"value": "[parameters('trigger4_properties_pipeline_parameters_start')]"
+					},
+					"trigger4_properties_pipeline_parameters_end": {
+						"value": "[parameters('trigger4_properties_pipeline_parameters_end')]"
 					}
 				}
 			},
