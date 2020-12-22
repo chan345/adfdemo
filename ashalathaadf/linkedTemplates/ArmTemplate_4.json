@@ -360,10 +360,10 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"runtimeState": "Started",
+				"runtimeState": "Stopped",
 				"pipeline": {
 					"pipelineReference": {
-						"referenceName": "pipeline1",
+						"referenceName": "pipeline_tumblinh_trigger",
 						"type": "PipelineReference"
 					},
 					"parameters": {
