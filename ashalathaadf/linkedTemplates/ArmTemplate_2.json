@@ -771,14 +771,14 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "SourceDataset_4oi",
+								"referenceName": "wiley_input",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
 						],
 						"outputs": [
 							{
-								"referenceName": "DestinationDataset_4oi",
+								"referenceName": "outfile",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
@@ -795,7 +795,10 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/wiley_input')]",
+				"[concat(variables('factoryId'), '/datasets/outfile')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/copy_transaction')]",
