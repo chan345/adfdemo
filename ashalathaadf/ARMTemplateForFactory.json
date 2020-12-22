@@ -1396,12 +1396,10 @@
 				],
 				"parameters": {
 					"start": {
-						"type": "string",
-						"defaultValue": "formatDateTime(@trigger().outputs.windowStartTime,'yyyy-MM-ddTHH:mm:ss')"
+						"type": "string"
 					},
 					"end": {
-						"type": "string",
-						"defaultValue": "formatDateTime(@trigger().outputs.windowEndTime,'yyyy-MM-ddTHH:mm:ss')"
+						"type": "string"
 					}
 				},
 				"annotations": []
@@ -4618,7 +4616,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"runtimeState": "Started",
+				"runtimeState": "Stopped",
 				"pipeline": {
 					"pipelineReference": {
 						"referenceName": "CopyPipeline_4oi",
@@ -4830,7 +4828,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"runtimeState": "Stopped",
+				"runtimeState": "Started",
 				"pipeline": {
 					"pipelineReference": {
 						"referenceName": "pipeline1",
