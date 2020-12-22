@@ -30,11 +30,7 @@
 							"type": "AzureBlobFSReadSettings",
 							"recursive": true,
 							"modifiedDatetimeStart": {
-								"value": "@trigger.starttime",
-								"type": "Expression"
-							},
-							"modifiedDatetimeEnd": {
-								"value": "@trigger.endtime",
+								"value": "@trigger.startTime",
 								"type": "Expression"
 							},
 							"wildcardFileName": "*",
@@ -73,14 +69,6 @@
 				]
 			}
 		],
-		"parameters": {
-			"windowStart": {
-				"type": "String"
-			},
-			"windowEnd": {
-				"type": "String"
-			}
-		},
 		"annotations": []
 	}
 }
