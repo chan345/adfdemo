@@ -21,7 +21,7 @@
 							"type": "AzureBlobFSReadSettings",
 							"recursive": true,
 							"modifiedDatetimeStart": {
-								"value": "@trigger.starttime",
+								"value": "@pipeline().parameters.schedue",
 								"type": "Expression"
 							},
 							"modifiedDatetimeEnd": "2020-12-23T00:00:00.000Z",
@@ -67,6 +67,12 @@
 				]
 			}
 		],
+		"parameters": {
+			"schedue": {
+				"type": "string",
+				"defaultValue": "@trigger().scheduledTime"
+			}
+		},
 		"annotations": []
 	}
 }
