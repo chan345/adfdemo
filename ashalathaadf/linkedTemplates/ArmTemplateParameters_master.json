@@ -44,6 +44,12 @@
 		"SqlServer_on_premises_properties_typeProperties_userName": {
 			"value": "HAPPIESTMINDS\\Chandra.babu"
 		},
+		"Trigger_5qt_properties_CopyPipeline_5qt_parameters_windowStart": {
+			"value": "@{addminutes(trigger().scheduledTime, -3)}"
+		},
+		"Trigger_5qt_properties_CopyPipeline_5qt_parameters_windowEnd": {
+			"value": "@trigger().scheduledTime"
+		},
 		"containerUri": {
 			"value": ""
 		},

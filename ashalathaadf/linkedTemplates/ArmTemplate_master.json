@@ -59,6 +59,14 @@
 			"type": "string",
 			"defaultValue": "HAPPIESTMINDS\\Chandra.babu"
 		},
+		"Trigger_5qt_properties_CopyPipeline_5qt_parameters_windowStart": {
+			"type": "string",
+			"defaultValue": "@{addminutes(trigger().scheduledTime, -3)}"
+		},
+		"Trigger_5qt_properties_CopyPipeline_5qt_parameters_windowEnd": {
+			"type": "string",
+			"defaultValue": "@trigger().scheduledTime"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -182,11 +190,37 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"Trigger_5qt_properties_CopyPipeline_5qt_parameters_windowStart": {
+						"value": "[parameters('Trigger_5qt_properties_CopyPipeline_5qt_parameters_windowStart')]"
+					},
+					"Trigger_5qt_properties_CopyPipeline_5qt_parameters_windowEnd": {
+						"value": "[parameters('Trigger_5qt_properties_CopyPipeline_5qt_parameters_windowEnd')]"
 					}
 				}
 			},
 			"dependsOn": [
 				"[resourceId('Microsoft.Resources/deployments', 'ashalathaadf_ArmTemplate_2')]"
+			]
+		},
+		{
+			"name": "ashalathaadf_ArmTemplate_4",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_4.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'ashalathaadf_ArmTemplate_3')]"
 			]
 		}
 	]
