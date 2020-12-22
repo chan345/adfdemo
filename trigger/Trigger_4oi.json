@@ -2,7 +2,7 @@
 	"name": "Trigger_4oi",
 	"properties": {
 		"annotations": [],
-		"runtimeState": "Started",
+		"runtimeState": "Stopped",
 		"pipeline": {
 			"pipelineReference": {
 				"referenceName": "CopyPipeline_4oi",
