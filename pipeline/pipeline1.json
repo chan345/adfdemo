@@ -52,8 +52,7 @@
 						"type": "DatasetReference"
 					},
 					"timeout": "7.00:00:10",
-					"sleep": 1,
-					"childItems": false
+					"sleep": 0
 				}
 			}
 		],
