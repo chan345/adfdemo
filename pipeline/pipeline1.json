@@ -72,10 +72,12 @@
 		],
 		"parameters": {
 			"start": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "@trigger.scheduledtime"
 			},
 			"end": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "@trigger.scheduledtime"
 			}
 		},
 		"annotations": []
