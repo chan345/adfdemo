@@ -215,6 +215,34 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Trigger_x7l')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1,
+						"startTime": "2020-12-22T06:48:00Z",
+						"timeZone": "UTC",
+						"schedule": {
+							"minutes": [
+								5
+							],
+							"hours": [
+								11
+							]
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/tm')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
@@ -232,6 +260,27 @@
 						"intervalInSeconds": 30
 					},
 					"dependsOn": []
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trigger3')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Minute",
+						"interval": 2,
+						"startTime": "2020-12-22T05:19:00Z",
+						"endTime": "2020-12-23T05:24:45Z",
+						"timeZone": "UTC"
+					}
 				}
 			},
 			"dependsOn": []
@@ -451,257 +500,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/AzureSynapseAnalytics')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DestinationDataset_x7l')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureDataLakeStorage1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileSystem": "output"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"quoteChar": "\""
-				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Json_book')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureDataLakeStorage1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Json",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": "book.json",
-						"fileSystem": "input"
-					}
-				},
-				"schema": {
-					"type": "object",
-					"properties": {
-						"name": {
-							"type": "array",
-							"items": {
-								"type": "object",
-								"properties": {
-									"locale": {
-										"type": "string"
-									},
-									"value": {
-										"type": "string"
-									}
-								}
-							}
-						},
-						"description": {
-							"type": "array",
-							"items": {
-								"type": "object",
-								"properties": {
-									"locale": {
-										"type": "string"
-									},
-									"value": {
-										"type": "string"
-									}
-								}
-							}
-						},
-						"authorInfos": {
-							"type": "array",
-							"items": {
-								"type": "object",
-								"properties": {
-									"name": {
-										"type": "array",
-										"items": {
-											"type": "object",
-											"properties": {
-												"locale": {
-													"type": "string"
-												},
-												"value": {
-													"type": "string"
-												}
-											}
-										}
-									},
-									"role": {
-										"type": "array",
-										"items": {
-											"type": "object",
-											"properties": {
-												"locale": {
-													"type": "string"
-												},
-												"value": {
-													"type": "string"
-												}
-											}
-										}
-									}
-								}
-							}
-						},
-						"textLanguage": {
-							"type": "string"
-						},
-						"keywords": {
-							"type": "array",
-							"items": {
-								"type": "object",
-								"properties": {
-									"locale": {
-										"type": "string"
-									},
-									"value": {
-										"type": "string"
-									}
-								}
-							}
-						},
-						"textbook": {
-							"type": "array",
-							"items": {
-								"type": "object",
-								"properties": {
-									"locale": {
-										"type": "string"
-									},
-									"value": {
-										"type": "string"
-									}
-								}
-							}
-						},
-						"bestSeller": {
-							"type": "string"
-						},
-						"coverImage": {
-							"type": "object",
-							"properties": {
-								"renditions": {
-									"type": "array",
-									"items": {
-										"type": "object",
-										"properties": {
-											"mediaFormat": {
-												"type": "string"
-											},
-											"url": {
-												"type": "string"
-											},
-											"altText": {
-												"type": "string"
-											},
-											"mimeType": {
-												"type": "string"
-											}
-										}
-									}
-								}
-							}
-						},
-						"newToEdition": {
-							"type": "array",
-							"items": {
-								"type": "object",
-								"properties": {
-									"locale": {
-										"type": "string"
-									},
-									"value": {
-										"type": "string"
-									}
-								}
-							}
-						},
-						"whatsNew": {
-							"type": "array",
-							"items": {
-								"type": "object",
-								"properties": {
-									"locale": {
-										"type": "string"
-									},
-									"value": {
-										"type": "string"
-									}
-								}
-							}
-						},
-						"tableOfContents": {
-							"type": "array",
-							"items": {
-								"type": "object",
-								"properties": {
-									"locale": {
-										"type": "string"
-									},
-									"value": {
-										"type": "string"
-									}
-								}
-							}
-						},
-						"subjectIds": {
-							"type": "array",
-							"items": {
-								"type": "string"
-							}
-						},
-						"courseIds": {
-							"type": "array",
-							"items": {
-								"type": "string"
-							}
-						},
-						"brandIds": {
-							"type": "array",
-							"items": {
-								"type": "string"
-							}
-						},
-						"webLinks": {
-							"type": "array",
-							"items": {
-								"type": "object",
-								"properties": {
-									"type": {
-										"type": "string"
-									},
-									"url": {
-										"type": "string"
-									}
-								}
-							}
-						}
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
 			]
 		}
 	]

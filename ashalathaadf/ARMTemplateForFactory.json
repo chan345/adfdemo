@@ -66,18 +66,6 @@
 		"Trigger_5qt_properties_pipeline_schedule_trigger_parameters_windowEnd": {
 			"type": "string",
 			"defaultValue": "@trigger().scheduledTime"
-		},
-		"Trigger_x7l_properties_CopyPipeline_x7l_parameters_windowStart": {
-			"type": "string",
-			"defaultValue": "@{adddays(trigger().scheduledTime, -1)}"
-		},
-		"Trigger_x7l_properties_CopyPipeline_x7l_parameters_windowEnd": {
-			"type": "string",
-			"defaultValue": "@trigger().scheduledTime"
-		},
-		"trigger3_properties_pipeline1_parameters_start": {
-			"type": "string",
-			"defaultValue": "trigger().scheduledtime"
 		}
 	},
 	"variables": {
@@ -230,100 +218,6 @@
 				"[concat(variables('factoryId'), '/datasets/SourceDataset_rj2')]",
 				"[concat(variables('factoryId'), '/datasets/DestinationDataset_rj2')]",
 				"[concat(variables('factoryId'), '/linkedServices/stage_plybase')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/CopyPipeline_x7l')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Copy_x7l",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [
-							{
-								"name": "Source",
-								"value": "//"
-							},
-							{
-								"name": "Destination",
-								"value": "output//"
-							}
-						],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true,
-									"modifiedDatetimeStart": {
-										"value": "@pipeline().parameters.windowStart",
-										"type": "Expression"
-									},
-									"modifiedDatetimeEnd": {
-										"value": "@pipeline().parameters.windowEnd",
-										"type": "Expression"
-									},
-									"wildcardFileName": "*",
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings",
-									"skipLineCount": 0
-								}
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
-							},
-							"enableStaging": false,
-							"validateDataConsistency": false
-						},
-						"inputs": [
-							{
-								"referenceName": "SourceDataset_x7l",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "DestinationDataset_x7l",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"parameters": {
-					"windowStart": {
-						"type": "String"
-					},
-					"windowEnd": {
-						"type": "String"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/SourceDataset_x7l')]",
-				"[concat(variables('factoryId'), '/datasets/DestinationDataset_x7l')]"
 			]
 		},
 		{
@@ -1401,11 +1295,11 @@
 				"parameters": {
 					"start": {
 						"type": "string",
-						"defaultValue": "@trigger.scheduledtime"
+						"defaultValue": "@trigger().outputs.windowStartTime"
 					},
 					"end": {
 						"type": "string",
-						"defaultValue": "@trigger.scheduledtime"
+						"defaultValue": "@trigger().outputs.windowEndTime"
 					}
 				},
 				"annotations": []
@@ -4597,24 +4491,7 @@
 			"properties": {
 				"annotations": [],
 				"runtimeState": "Stopped",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "CopyPipeline_x7l",
-							"type": "PipelineReference"
-						},
-						"parameters": {
-							"windowStart": {
-								"type": "Expression",
-								"value": "[parameters('Trigger_x7l_properties_CopyPipeline_x7l_parameters_windowStart')]"
-							},
-							"windowEnd": {
-								"type": "Expression",
-								"value": "[parameters('Trigger_x7l_properties_CopyPipeline_x7l_parameters_windowEnd')]"
-							}
-						}
-					}
-				],
+				"pipelines": [],
 				"type": "ScheduleTrigger",
 				"typeProperties": {
 					"recurrence": {
@@ -4633,9 +4510,7 @@
 					}
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/CopyPipeline_x7l')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/tm')]",
@@ -4725,18 +4600,8 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "pipeline1",
-							"type": "PipelineReference"
-						},
-						"parameters": {
-							"start": "[parameters('trigger3_properties_pipeline1_parameters_start')]"
-						}
-					}
-				],
+				"runtimeState": "Stopped",
+				"pipelines": [],
 				"type": "ScheduleTrigger",
 				"typeProperties": {
 					"recurrence": {
@@ -4746,6 +4611,36 @@
 						"endTime": "2020-12-23T05:24:45Z",
 						"timeZone": "UTC"
 					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trigger4')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipeline": {
+					"pipelineReference": {
+						"referenceName": "pipeline1",
+						"type": "PipelineReference"
+					},
+					"parameters": {}
+				},
+				"type": "TumblingWindowTrigger",
+				"typeProperties": {
+					"frequency": "Minute",
+					"interval": 5,
+					"startTime": "2020-12-22T06:59:00.000Z",
+					"endTime": "2020-12-23T06:59:00.000Z",
+					"delay": "00:00:00",
+					"maxConcurrency": 50,
+					"retryPolicy": {
+						"intervalInSeconds": 30
+					},
+					"dependsOn": []
 				}
 			},
 			"dependsOn": [

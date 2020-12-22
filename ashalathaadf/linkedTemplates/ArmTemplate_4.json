@@ -14,24 +14,72 @@
 		"Trigger_5qt_properties_pipeline_schedule_trigger_parameters_windowEnd": {
 			"type": "string",
 			"defaultValue": "@trigger().scheduledTime"
-		},
-		"Trigger_x7l_properties_CopyPipeline_x7l_parameters_windowStart": {
-			"type": "string",
-			"defaultValue": "@{adddays(trigger().scheduledTime, -1)}"
-		},
-		"Trigger_x7l_properties_CopyPipeline_x7l_parameters_windowEnd": {
-			"type": "string",
-			"defaultValue": "@trigger().scheduledTime"
-		},
-		"trigger3_properties_pipeline1_parameters_start": {
-			"type": "string",
-			"defaultValue": "trigger().scheduledtime"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline_transaction')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "transaction_data",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "dataflow_transaction",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"sourcetransaction": {},
+									"lkptrans": {},
+									"lkpcustomer": {},
+									"maxsurgagekey": {},
+									"lkpincremental": {},
+									"INSERTtransaction": {},
+									"UPDATEtransaction": {}
+								}
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "stage_plybase",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "stage"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"variables": {
+					"test": {
+						"type": "Array"
+					}
+				},
+				"folder": {
+					"name": "Demo"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/pipeline_union_dataflow')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
@@ -115,77 +163,31 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Trigger_x7l')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Stopped",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "CopyPipeline_x7l",
-							"type": "PipelineReference"
-						},
-						"parameters": {
-							"windowStart": {
-								"type": "Expression",
-								"value": "[parameters('Trigger_x7l_properties_CopyPipeline_x7l_parameters_windowStart')]"
-							},
-							"windowEnd": {
-								"type": "Expression",
-								"value": "[parameters('Trigger_x7l_properties_CopyPipeline_x7l_parameters_windowEnd')]"
-							}
-						}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Day",
-						"interval": 1,
-						"startTime": "2020-12-22T06:48:00Z",
-						"timeZone": "UTC",
-						"schedule": {
-							"minutes": [
-								5
-							],
-							"hours": [
-								11
-							]
-						}
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/trigger3')]",
+			"name": "[concat(parameters('factoryName'), '/trigger4')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
 				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "pipeline1",
-							"type": "PipelineReference"
-						},
-						"parameters": {
-							"start": "[parameters('trigger3_properties_pipeline1_parameters_start')]"
-						}
-					}
-				],
-				"type": "ScheduleTrigger",
+				"pipeline": {
+					"pipelineReference": {
+						"referenceName": "pipeline1",
+						"type": "PipelineReference"
+					},
+					"parameters": {}
+				},
+				"type": "TumblingWindowTrigger",
 				"typeProperties": {
-					"recurrence": {
-						"frequency": "Minute",
-						"interval": 2,
-						"startTime": "2020-12-22T05:19:00Z",
-						"endTime": "2020-12-23T05:24:45Z",
-						"timeZone": "UTC"
-					}
+					"frequency": "Minute",
+					"interval": 5,
+					"startTime": "2020-12-22T06:59:00.000Z",
+					"endTime": "2020-12-23T06:59:00.000Z",
+					"delay": "00:00:00",
+					"maxConcurrency": 50,
+					"retryPolicy": {
+						"intervalInSeconds": 30
+					},
+					"dependsOn": []
 				}
 			},
 			"dependsOn": []
@@ -487,7 +489,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pipeline_transaction')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/trigger1')]",

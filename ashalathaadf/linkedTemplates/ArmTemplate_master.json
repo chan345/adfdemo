@@ -67,18 +67,6 @@
 			"type": "string",
 			"defaultValue": "@trigger().scheduledTime"
 		},
-		"Trigger_x7l_properties_CopyPipeline_x7l_parameters_windowStart": {
-			"type": "string",
-			"defaultValue": "@{adddays(trigger().scheduledTime, -1)}"
-		},
-		"Trigger_x7l_properties_CopyPipeline_x7l_parameters_windowEnd": {
-			"type": "string",
-			"defaultValue": "@trigger().scheduledTime"
-		},
-		"trigger3_properties_pipeline1_parameters_start": {
-			"type": "string",
-			"defaultValue": "trigger().scheduledtime"
-		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -228,15 +216,6 @@
 					},
 					"Trigger_5qt_properties_pipeline_schedule_trigger_parameters_windowEnd": {
 						"value": "[parameters('Trigger_5qt_properties_pipeline_schedule_trigger_parameters_windowEnd')]"
-					},
-					"Trigger_x7l_properties_CopyPipeline_x7l_parameters_windowStart": {
-						"value": "[parameters('Trigger_x7l_properties_CopyPipeline_x7l_parameters_windowStart')]"
-					},
-					"Trigger_x7l_properties_CopyPipeline_x7l_parameters_windowEnd": {
-						"value": "[parameters('Trigger_x7l_properties_CopyPipeline_x7l_parameters_windowEnd')]"
-					},
-					"trigger3_properties_pipeline1_parameters_start": {
-						"value": "[parameters('trigger3_properties_pipeline1_parameters_start')]"
 					}
 				}
 			},
