@@ -44,6 +44,12 @@
 		"SqlServer_on_premises_properties_typeProperties_userName": {
 			"value": "HAPPIESTMINDS\\Chandra.babu"
 		},
+		"Trigger_4oi_properties_pipeline_parameters_windowStart": {
+			"value": "@trigger().outputs.windowStartTime"
+		},
+		"Trigger_4oi_properties_pipeline_parameters_windowEnd": {
+			"value": "@trigger().outputs.windowEndTime"
+		},
 		"Trigger_5qt_properties_pipeline_schedule_trigger_parameters_windowStart": {
 			"value": "@{addminutes(trigger().scheduledTime, -3)}"
 		},

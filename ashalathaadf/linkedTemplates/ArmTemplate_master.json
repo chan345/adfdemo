@@ -59,6 +59,14 @@
 			"type": "string",
 			"defaultValue": "HAPPIESTMINDS\\Chandra.babu"
 		},
+		"Trigger_4oi_properties_pipeline_parameters_windowStart": {
+			"type": "string",
+			"defaultValue": "@trigger().outputs.windowStartTime"
+		},
+		"Trigger_4oi_properties_pipeline_parameters_windowEnd": {
+			"type": "string",
+			"defaultValue": "@trigger().outputs.windowEndTime"
+		},
 		"Trigger_5qt_properties_pipeline_schedule_trigger_parameters_windowStart": {
 			"type": "string",
 			"defaultValue": "@{addminutes(trigger().scheduledTime, -3)}"
@@ -210,6 +218,12 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"Trigger_4oi_properties_pipeline_parameters_windowStart": {
+						"value": "[parameters('Trigger_4oi_properties_pipeline_parameters_windowStart')]"
+					},
+					"Trigger_4oi_properties_pipeline_parameters_windowEnd": {
+						"value": "[parameters('Trigger_4oi_properties_pipeline_parameters_windowEnd')]"
 					},
 					"Trigger_5qt_properties_pipeline_schedule_trigger_parameters_windowStart": {
 						"value": "[parameters('Trigger_5qt_properties_pipeline_schedule_trigger_parameters_windowStart')]"
