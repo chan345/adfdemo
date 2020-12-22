@@ -73,11 +73,11 @@
 		"parameters": {
 			"start": {
 				"type": "string",
-				"defaultValue": "formatDateTime(trigger().outputs.windowStartTime,'-dd-MM-yyyy-HH-mm-ss-ffff')"
+				"defaultValue": "formatDateTime(@trigger().outputs.windowStartTime,'yyyy-MM-ddTHH:mm:ss')"
 			},
 			"end": {
 				"type": "string",
-				"defaultValue": "formatDateTime(trigger().outputs.windowEndTime,'-dd-MM-yyyy-HH-mm-ss-ffff')"
+				"defaultValue": "formatDateTime(@trigger().outputs.windowEndTime,'yyyy-MM-ddTHH:mm:ss')"
 			}
 		},
 		"annotations": []
