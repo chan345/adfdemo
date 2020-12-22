@@ -51,7 +51,7 @@
 						"referenceName": "wiley_input",
 						"type": "DatasetReference"
 					},
-					"timeout": "7.00:00:00",
+					"timeout": "7.00:00:10",
 					"sleep": 1,
 					"childItems": false
 				}
