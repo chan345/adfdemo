@@ -6,7 +6,7 @@
 		"pipelines": [
 			{
 				"pipelineReference": {
-					"referenceName": "CopyPipeline_5qt",
+					"referenceName": "pipeline_schedule_trigger",
 					"type": "PipelineReference"
 				},
 				"parameters": {
