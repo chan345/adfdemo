@@ -3,113 +3,57 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Switch1",
-				"type": "Switch",
+				"name": "Get Metadata1",
+				"type": "GetMetadata",
 				"dependsOn": [
 					{
-						"activity": "Set variable1",
+						"activity": "Validation1",
 						"dependencyConditions": [
 							"Succeeded"
 						]
 					}
 				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
 				"userProperties": [],
 				"typeProperties": {
-					"on": {
-						"value": "@variables('v')",
-						"type": "Expression"
+					"dataset": {
+						"referenceName": "wiley_input",
+						"type": "DatasetReference"
 					},
-					"cases": [
+					"fieldList": [
 						{
-							"value": "out1",
-							"activities": [
-								{
-									"name": "Copy data1",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "DelimitedTextSource",
-											"storeSettings": {
-												"type": "AzureBlobFSReadSettings",
-												"recursive": true,
-												"wildcardFileName": "*.txt",
-												"enablePartitionDiscovery": false
-											},
-											"formatSettings": {
-												"type": "DelimitedTextReadSettings"
-											}
-										},
-										"sink": {
-											"type": "DelimitedTextSink",
-											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings"
-											},
-											"formatSettings": {
-												"type": "DelimitedTextWriteSettings",
-												"quoteAllText": true,
-												"fileExtension": ".txt"
-											}
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "wiley_input",
-											"type": "DatasetReference"
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "outfile",
-											"type": "DatasetReference"
-										}
-									]
-								}
-							]
-						},
-						{
-							"value": "out2",
-							"activities": [
-								{
-									"name": "Set variable2",
-									"type": "SetVariable",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "s2",
-										"value": "'s2 sucess'"
-									}
-								}
-							]
+							"value": "@activity('Validation1').output",
+							"type": "Expression"
 						}
-					]
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
+					}
 				}
 			},
 			{
-				"name": "Set variable1",
-				"type": "SetVariable",
+				"name": "Validation1",
+				"type": "Validation",
 				"dependsOn": [],
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "v",
-					"value": "'out1'"
+					"dataset": {
+						"referenceName": "wiley_input",
+						"type": "DatasetReference"
+					},
+					"timeout": "7.00:00:00",
+					"sleep": 1,
+					"childItems": false
 				}
 			}
 		],
