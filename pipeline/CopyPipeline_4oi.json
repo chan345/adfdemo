@@ -61,13 +61,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "SourceDataset_4oi",
+						"referenceName": "wiley_input",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "DestinationDataset_4oi",
+						"referenceName": "outfile",
 						"type": "DatasetReference"
 					}
 				]
