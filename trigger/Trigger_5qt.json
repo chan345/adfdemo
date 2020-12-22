@@ -1,0 +1,35 @@
+{
+	"name": "Trigger_5qt",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "CopyPipeline_5qt",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "Expression",
+						"value": "@{addminutes(trigger().scheduledTime, -3)}"
+					},
+					"windowEnd": {
+						"type": "Expression",
+						"value": "@trigger().scheduledTime"
+					}
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Minute",
+				"interval": 3,
+				"startTime": "2020-12-22T05:54:00Z",
+				"endTime": "2020-12-23T05:54:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}
