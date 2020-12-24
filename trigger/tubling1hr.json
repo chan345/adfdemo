@@ -7,6 +7,16 @@
 			"pipelineReference": {
 				"referenceName": "CopyPipeline_9y3",
 				"type": "PipelineReference"
+			},
+			"parameters": {
+				"windowStart": {
+					"type": "Expression",
+					"value": "@trigger().outputs.windowStartTime"
+				},
+				"windowEnd": {
+					"type": "Expression",
+					"value": "@trigger().outputs.windowEndTime"
+				}
 			}
 		},
 		"type": "TumblingWindowTrigger",
