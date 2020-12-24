@@ -75,11 +75,27 @@
 			"type": "string",
 			"defaultValue": "@trigger().scheduledTime"
 		},
+		"Trigger_9y3_properties_pipeline_parameters_windowStart": {
+			"type": "string",
+			"defaultValue": "@trigger().outputs.windowStartTime"
+		},
+		"Trigger_9y3_properties_pipeline_parameters_windowEnd": {
+			"type": "string",
+			"defaultValue": "@trigger().outputs.windowEndTime"
+		},
 		"trigger4_properties_pipeline_parameters_start": {
 			"type": "string",
 			"defaultValue": "@trigger().outputs.windowStartTime"
 		},
 		"trigger4_properties_pipeline_parameters_end": {
+			"type": "string",
+			"defaultValue": "@trigger().outputs.windowEndTime"
+		},
+		"tubling1hr_properties_pipeline_parameters_windowStart": {
+			"type": "string",
+			"defaultValue": "@trigger().outputs.windowStartTime"
+		},
+		"tubling1hr_properties_pipeline_parameters_windowEnd": {
 			"type": "string",
 			"defaultValue": "@trigger().outputs.windowEndTime"
 		}
@@ -328,6 +344,99 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/wiley_input')]",
 				"[concat(variables('factoryId'), '/datasets/outfile')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CopyPipeline_9y3')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy_9y3",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "input//us.txt"
+							},
+							{
+								"name": "Destination",
+								"value": "output//"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"modifiedDatetimeStart": {
+										"value": "@pipeline().parameters.windowStart",
+										"type": "Expression"
+									},
+									"modifiedDatetimeEnd": {
+										"value": "@pipeline().parameters.windowEnd",
+										"type": "Expression"
+									},
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings",
+									"skipLineCount": 0
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"validateDataConsistency": false
+						},
+						"inputs": [
+							{
+								"referenceName": "SourceDataset_9y3",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestinationDataset_9y3",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"parameters": {
+					"windowStart": {
+						"type": "String"
+					},
+					"windowEnd": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SourceDataset_9y3')]",
+				"[concat(variables('factoryId'), '/datasets/DestinationDataset_9y3')]"
 			]
 		},
 		{
@@ -1324,6 +1433,155 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/emp_example')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get Metadata1",
+						"type": "GetMetadata",
+						"dependsOn": [
+							{
+								"activity": "Validation1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "wiley_input",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"fieldList": [
+								{
+									"value": "@activity('Validation1').output",
+									"type": "Expression"
+								}
+							],
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							},
+							"formatSettings": {
+								"type": "DelimitedTextReadSettings"
+							}
+						}
+					},
+					{
+						"name": "Validation1",
+						"type": "Validation",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "wiley_input",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"timeout": "7.00:00:10",
+							"sleep": 0
+						}
+					}
+				],
+				"variables": {
+					"v": {
+						"type": "String",
+						"defaultValue": "out1"
+					},
+					"s1": {
+						"type": "String"
+					},
+					"s2": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/wiley_input')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"wildcardFileName": "us.txt",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"tableOption": "autoCreate"
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "wiley_input",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "AzureSqlTable1",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/wiley_input')]",
+				"[concat(variables('factoryId'), '/datasets/AzureSqlTable1')]"
 			]
 		},
 		{
@@ -2561,6 +2819,40 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlTable1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "country",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "us"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/AzureSqlTable_cust')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -2719,6 +3011,32 @@
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DestinationDataset_5qt')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "output"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DestinationDataset_9y3')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -3108,6 +3426,47 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
+						"fileSystem": "input"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "id",
+						"type": "String"
+					},
+					{
+						"name": "name",
+						"type": "String"
+					},
+					{
+						"name": "country",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SourceDataset_9y3')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "us.txt",
 						"fileSystem": "input"
 					},
 					"columnDelimiter": ",",
@@ -4702,6 +5061,47 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Trigger_9y3')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipeline": {
+					"pipelineReference": {
+						"referenceName": "CopyPipeline_9y3",
+						"type": "PipelineReference"
+					},
+					"parameters": {
+						"windowStart": {
+							"type": "Expression",
+							"value": "[parameters('Trigger_9y3_properties_pipeline_parameters_windowStart')]"
+						},
+						"windowEnd": {
+							"type": "Expression",
+							"value": "[parameters('Trigger_9y3_properties_pipeline_parameters_windowEnd')]"
+						}
+					}
+				},
+				"type": "TumblingWindowTrigger",
+				"typeProperties": {
+					"frequency": "Hour",
+					"interval": 3,
+					"startTime": "2020-12-24T10:35:00.000Z",
+					"endTime": "2020-12-26T10:35:00.000Z",
+					"delay": "00:00:00",
+					"maxConcurrency": 50,
+					"retryPolicy": {
+						"intervalInSeconds": 30
+					},
+					"dependsOn": []
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/CopyPipeline_9y3')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Trigger_x7l')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
@@ -4725,28 +5125,6 @@
 							]
 						}
 					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/tm')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Stopped",
-				"type": "TumblingWindowTrigger",
-				"typeProperties": {
-					"frequency": "Minute",
-					"interval": 15,
-					"startTime": "2020-12-17T08:36:00.000Z",
-					"delay": "00:00:00",
-					"maxConcurrency": 50,
-					"retryPolicy": {
-						"intervalInSeconds": 30
-					},
-					"dependsOn": []
 				}
 			},
 			"dependsOn": []
@@ -4905,41 +5283,6 @@
 				"typeProperties": {}
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/WranglingDataFlow1')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "WranglingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"name": "input_blob_cust",
-							"script": "",
-							"dataset": {
-								"referenceName": "input_blob_cust",
-								"type": "DatasetReference"
-							}
-						}
-					],
-					"sinks": [
-						{
-							"name": "Sink1",
-							"dataset": {
-								"referenceName": "datalake_output",
-								"type": "DatasetReference"
-							},
-							"script": "sink(input(\n\t\tcustomer_Id as string,\n\t\tDOB as string,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tCreated_Modified_Date as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Sink1"
-						}
-					],
-					"script": "section Section1;\r\nshared input_blob_cust = let\r\n  AdfDoc = AzureStorage.BlobContents(\"https://chandrablobstorage1.blob.core.windows.net/input/Customer.csv\"),\r\n  Csv = Csv.Document(AdfDoc, [Delimiter = \",\", Encoding = TextEncoding.Utf8, QuoteStyle = QuoteStyle.Csv])\r\nin\r\n  Csv;\r\nshared UserQuery = let\r\n  Source = input_blob_cust,\r\n  #\"Removed columns\" = Table.RemoveColumns(Source, {\"Column6\"})\r\nin\r\n  #\"Removed columns\";\r\n"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/input_blob_cust')]",
-				"[concat(variables('factoryId'), '/datasets/datalake_output')]"
-			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/dataflow_conditionalsplit')]",
@@ -5128,7 +5471,7 @@
 							"name": "updateflowProcess"
 						}
 					],
-					"script": "source(output(\n\t\tcustomer_Id as integer,\n\t\tDOB as string,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tCreated_Modified_Date as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> inputcustomer\nsource(output(\n\t\tD_KEY as integer,\n\t\tcustomer_Id as integer,\n\t\tDOB as date,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tlast_updated_date as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> dcustomer\nsource(output(\n\t\tD_KEY as integer,\n\t\tout_key as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'select max(D_KEY) as D_KEY,\\'1\\' as out_key from D_customer',\n\tformat: 'query',\n\tstaged: false) ~> maxsurgarekey\nsource(output(\n\t\tSrc_Tab as string,\n\t\tWatermark_Value as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'select [Src_Tab],[Watermark_Value] from config',\n\tformat: 'query',\n\tstaged: false) ~> incremental\ninputcustomer derive(DOB = toDate(DOB,'dd-MM-yyyy'),\n\t\tCreated_Modified_Date = toTimestamp(Created_Modified_Date,'dd-MM-yyyy HH:mm'),\n\t\tinput_tablename = 'D_customer') ~> datatypechange\nupdateflowProcess alterRow(updateIf(true())) ~> AlterRow1\nincrementaldata, dcustomer exists(inputcustomer@customer_Id == dcustomer@customer_Id,\n\tnegate:true,\n\tbroadcast: 'auto')~> insertflow\nSurrogateKey derive(out_D_KEY = D_KEY+surgate_key) ~> generatesurgatekey\ninsertflow derive(input_key = '1') ~> JoinDerivedColumn\nJoinDerivedColumn, maxsurgarekey lookup(input_key == out_key,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookupmaxkey\nLookupmaxkey keyGenerate(output(surgate_key as long),\n\tstartAt: 1L) ~> SurrogateKey\ndatatypechange, incremental join(input_tablename == Src_Tab,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Joinincremental\nJoinincremental filter(Created_Modified_Date > Watermark_Value) ~> incrementaldata\nincrementaldata, dcustomer exists(inputcustomer@customer_Id == dcustomer@customer_Id,\n\tnegate:false,\n\tbroadcast: 'auto')~> updateflowProcess\nAlterRow1 sink(input(\n\t\tD_KEY as integer,\n\t\tcustomer_Id as integer,\n\t\tDOB as date,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tlast_updated_date as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:true,\n\tupsertable:false,\n\tkeys:['customer_Id'],\n\tformat: 'table',\n\tstaged: true,\n\tpostSQLs:['update config set [Watermark_Value]= (select max(last_updated_date) from D_customer) where [Src_Tab]=\\'D_customer\\''],\n\tmapColumn(\n\t\tcustomer_Id,\n\t\tDOB,\n\t\tGender,\n\t\tcity_code,\n\t\tCustomer_Name,\n\t\tlast_updated_date = Created_Modified_Date\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tsaveOrder: 2) ~> updatecustomer\ngeneratesurgatekey sink(input(\n\t\tD_KEY as integer,\n\t\tcustomer_Id as integer,\n\t\tDOB as date,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tlast_updated_date as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tmapColumn(\n\t\tcustomer_Id,\n\t\tDOB,\n\t\tGender,\n\t\tcity_code,\n\t\tCustomer_Name,\n\t\tlast_updated_date = Created_Modified_Date,\n\t\tD_KEY = out_D_KEY\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tsaveOrder: 1) ~> insertcustomer"
+					"script": "source(output(\n\t\tcustomer_Id as integer,\n\t\tDOB as string,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tCreated_Modified_Date as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> inputcustomer\nsource(output(\n\t\tD_KEY as integer,\n\t\tcustomer_Id as integer,\n\t\tDOB as date,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tlast_updated_date as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> dcustomer\nsource(output(\n\t\tD_KEY as integer,\n\t\tout_key as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'select max(D_KEY) as D_KEY,\\'1\\' as out_key from D_customer',\n\tformat: 'query',\n\tstaged: false) ~> maxsurgarekey\nsource(output(\n\t\tSrc_Tab as string,\n\t\tWatermark_Value as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'select [Src_Tab],[Watermark_Value] from config',\n\tformat: 'query',\n\tstaged: false) ~> incremental\ninputcustomer derive(DOB = toDate(DOB,'dd-MM-yyyy'),\n\t\tCreated_Modified_Date = toTimestamp(Created_Modified_Date,'dd-MM-yyyy HH:mm'),\n\t\tinput_tablename = 'D_customer') ~> datatypechange\nupdateflowProcess alterRow(updateIf(true())) ~> AlterRow1\nincrementaldata, dcustomer exists(inputcustomer@customer_Id == dcustomer@customer_Id,\n\tnegate:true,\n\tbroadcast: 'auto')~> insertflow\nSurrogateKey derive(out_D_KEY = D_KEY+surgate_key) ~> generatesurgatekey\ninsertflow derive(input_key = '1') ~> JoinDerivedColumn\nJoinDerivedColumn, maxsurgarekey lookup(input_key == out_key,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookupmaxkey\nLookupmaxkey keyGenerate(output(surgate_key as long),\n\tstartAt: 1L) ~> SurrogateKey\ndatatypechange, incremental join(input_tablename == Src_Tab,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Joinincremental\nJoinincremental filter(Created_Modified_Date > Watermark_Value) ~> incrementaldata\nincrementaldata, dcustomer exists(inputcustomer@customer_Id == dcustomer@customer_Id,\n\tnegate:false,\n\tbroadcast: 'auto')~> updateflowProcess\nAlterRow1 sink(input(\n\t\tD_KEY as integer,\n\t\tcustomer_Id as integer,\n\t\tDOB as date,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tlast_updated_date as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:true,\n\tupsertable:false,\n\tkeys:['customer_Id'],\n\tformat: 'table',\n\tstaged: true,\n\tallowCopyCommand: true,\n\tpostSQLs:['update config set [Watermark_Value]= (select max(last_updated_date) from D_customer) where [Src_Tab]=\\'D_customer\\''],\n\tmapColumn(\n\t\tcustomer_Id,\n\t\tDOB,\n\t\tGender,\n\t\tcity_code,\n\t\tCustomer_Name,\n\t\tlast_updated_date = Created_Modified_Date\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tsaveOrder: 2) ~> updatecustomer\ngeneratesurgatekey sink(input(\n\t\tD_KEY as integer,\n\t\tcustomer_Id as integer,\n\t\tDOB as date,\n\t\tGender as string,\n\t\tcity_code as string,\n\t\tCustomer_Name as string,\n\t\tlast_updated_date as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tallowCopyCommand: true,\n\tmapColumn(\n\t\tcustomer_Id,\n\t\tDOB,\n\t\tGender,\n\t\tcity_code,\n\t\tCustomer_Name,\n\t\tlast_updated_date = Created_Modified_Date,\n\t\tD_KEY = out_D_KEY\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tsaveOrder: 1) ~> insertcustomer"
 				}
 			},
 			"dependsOn": [
@@ -5351,7 +5694,7 @@
 							"name": "AlterRow1"
 						}
 					],
-					"script": "source(output(\n\t\tprod_cat_code as integer,\n\t\tprod_cat as string,\n\t\tprod_sub_cat_code as integer,\n\t\tprod_subcat as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> productcategory\nproductcategory alterRow(upsertIf(true())) ~> AlterRow1\nAlterRow1 sink(input(\n\t\tprod_cat_code as integer,\n\t\tprod_category_Name as string,\n\t\tprod_sub_cat_code as integer,\n\t\tprod_subcategory as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['prod_cat_code','prod_sub_cat_code'],\n\tformat: 'table',\n\tstaged: true,\n\tmapColumn(\n\t\tprod_cat_code,\n\t\tprod_category_Name = prod_cat,\n\t\tprod_sub_cat_code,\n\t\tprod_subcategory = prod_subcat\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> targetproductcategory"
+					"script": "source(output(\n\t\tprod_cat_code as integer,\n\t\tprod_cat as string,\n\t\tprod_sub_cat_code as integer,\n\t\tprod_subcat as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> productcategory\nproductcategory alterRow(upsertIf(true())) ~> AlterRow1\nAlterRow1 sink(input(\n\t\tprod_cat_code as integer,\n\t\tprod_category_Name as string,\n\t\tprod_sub_cat_code as integer,\n\t\tprod_subcategory as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['prod_cat_code','prod_sub_cat_code'],\n\tformat: 'table',\n\tstaged: true,\n\tallowCopyCommand: true,\n\tmapColumn(\n\t\tprod_cat_code,\n\t\tprod_category_Name = prod_cat,\n\t\tprod_sub_cat_code,\n\t\tprod_subcategory = prod_subcat\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> targetproductcategory"
 				}
 			},
 			"dependsOn": [
@@ -5454,7 +5797,7 @@
 							"name": "Filterincr"
 						}
 					],
-					"script": "source(output(\n\t\ttransaction_id as string,\n\t\tcust_id as integer,\n\t\ttran_date as string,\n\t\tprod_subcat_code as integer,\n\t\tprod_cat_code as integer,\n\t\tQty as integer,\n\t\tRate as integer,\n\t\tTax as double,\n\t\ttotal_amt as double,\n\t\tStore_type as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> sourcetransaction\nsource(output(\n\t\tlkp_transaction_id as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'select transaction_id as lkp_transaction_id from Transactions',\n\tformat: 'query',\n\tstaged: false) ~> lkptrans\nsource(output(\n\t\tlkp_d_key as integer,\n\t\tlkp_customer_id as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'select D_KEY as lkp_d_key,customer_Id as lkp_customer_id from D_customer',\n\tformat: 'query',\n\tstaged: false) ~> lkpcustomer\nsource(output(\n\t\tmax_Transaction_key as integer,\n\t\tout_key as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'select max(Transaction_key) as max_Transaction_key,1 as out_key from Transactions',\n\tformat: 'query',\n\tstaged: false) ~> maxsurgagekey\nsource(output(\n\t\tSrc_Tab as string,\n\t\tWatermark_Value as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'select [Src_Tab],[Watermark_Value] from config where Src_Tab=\\'Transactions\\'',\n\tformat: 'query',\n\tstaged: false) ~> lkpincremental\nmaxkey keyGenerate(output(out_sutgate_key as long),\n\tstartAt: 1L) ~> SurrogateKey\nLookupcustomer derive(tran_date = toTimestamp(tran_date,'dd-MM-yyyy'),\n\t\tin_key = 1,\n\t\tin_src_tbl = 'Transactions') ~> DerivedColumn\nFilterincr, lkptrans exists(transaction_id == lkp_transaction_id,\n\tnegate:true,\n\tbroadcast: 'auto')~> insertEXIST\nFilterincr, lkptrans exists(transaction_id == lkp_transaction_id,\n\tnegate:false,\n\tbroadcast: 'auto')~> updateExist\nupdateExist alterRow(updateIf(true())) ~> updaterow\nsourcetransaction, lkpcustomer lookup(cust_id == lkp_customer_id,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookupcustomer\nSurrogateKey derive(out_trans_key = max_Transaction_key + out_sutgate_key) ~> DerivedColumn1\ninsertEXIST, maxsurgagekey lookup(in_key == out_key,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> maxkey\nDerivedColumn, lkpincremental lookup(in_src_tbl == Src_Tab,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookupincr\nLookupincr filter(tran_date > Watermark_Value) ~> Filterincr\nDerivedColumn1 sink(input(\n\t\tTransaction_key as integer,\n\t\tcustomer_Key as integer,\n\t\tcustomer_id as integer,\n\t\ttransaction_id as string,\n\t\ttran_date as date,\n\t\tprod_subcat_code as integer,\n\t\tprod_cat_code as integer,\n\t\tQty as integer,\n\t\tRate as integer,\n\t\tTax as decimal(12,2),\n\t\ttotal_amt as decimal(12,2),\n\t\tStore_type as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tmapColumn(\n\t\tcustomer_id = cust_id,\n\t\tcustomer_Key = lkp_d_key,\n\t\tTransaction_key = out_trans_key,\n\t\ttransaction_id,\n\t\ttran_date,\n\t\tprod_subcat_code,\n\t\tprod_cat_code,\n\t\tQty,\n\t\tRate,\n\t\tTax,\n\t\ttotal_amt,\n\t\tStore_type\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tsaveOrder: 1) ~> INSERTtransaction\nupdaterow sink(input(\n\t\tTransaction_key as integer,\n\t\tcustomer_Key as integer,\n\t\tcustomer_id as integer,\n\t\ttransaction_id as string,\n\t\ttran_date as date,\n\t\tprod_subcat_code as integer,\n\t\tprod_cat_code as integer,\n\t\tQty as integer,\n\t\tRate as integer,\n\t\tTax as decimal(12,2),\n\t\ttotal_amt as decimal(12,2),\n\t\tStore_type as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:true,\n\tupsertable:false,\n\tkeys:['transaction_id'],\n\tformat: 'table',\n\tstaged: true,\n\tpostSQLs:['update config set [Watermark_Value]= (select max(tran_date) from Transactions)\\nwhere Src_Tab=\\'Transactions\\''],\n\tmapColumn(\n\t\tcustomer_Key = lkp_d_key,\n\t\ttransaction_id,\n\t\ttran_date,\n\t\tprod_subcat_code,\n\t\tprod_cat_code,\n\t\tQty,\n\t\tRate,\n\t\tTax,\n\t\ttotal_amt,\n\t\tStore_type\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tsaveOrder: 2) ~> UPDATEtransaction"
+					"script": "source(output(\n\t\ttransaction_id as string,\n\t\tcust_id as integer,\n\t\ttran_date as string,\n\t\tprod_subcat_code as integer,\n\t\tprod_cat_code as integer,\n\t\tQty as integer,\n\t\tRate as integer,\n\t\tTax as double,\n\t\ttotal_amt as double,\n\t\tStore_type as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> sourcetransaction\nsource(output(\n\t\tlkp_transaction_id as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'select transaction_id as lkp_transaction_id from Transactions',\n\tformat: 'query',\n\tstaged: false) ~> lkptrans\nsource(output(\n\t\tlkp_d_key as integer,\n\t\tlkp_customer_id as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'select D_KEY as lkp_d_key,customer_Id as lkp_customer_id from D_customer',\n\tformat: 'query',\n\tstaged: false) ~> lkpcustomer\nsource(output(\n\t\tmax_Transaction_key as integer,\n\t\tout_key as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'select max(Transaction_key) as max_Transaction_key,1 as out_key from Transactions',\n\tformat: 'query',\n\tstaged: false) ~> maxsurgagekey\nsource(output(\n\t\tSrc_Tab as string,\n\t\tWatermark_Value as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'select [Src_Tab],[Watermark_Value] from config where Src_Tab=\\'Transactions\\'',\n\tformat: 'query',\n\tstaged: false) ~> lkpincremental\nmaxkey keyGenerate(output(out_sutgate_key as long),\n\tstartAt: 1L) ~> SurrogateKey\nLookupcustomer derive(tran_date = toTimestamp(tran_date,'dd-MM-yyyy'),\n\t\tin_key = 1,\n\t\tin_src_tbl = 'Transactions') ~> DerivedColumn\nFilterincr, lkptrans exists(transaction_id == lkp_transaction_id,\n\tnegate:true,\n\tbroadcast: 'auto')~> insertEXIST\nFilterincr, lkptrans exists(transaction_id == lkp_transaction_id,\n\tnegate:false,\n\tbroadcast: 'auto')~> updateExist\nupdateExist alterRow(updateIf(true())) ~> updaterow\nsourcetransaction, lkpcustomer lookup(cust_id == lkp_customer_id,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookupcustomer\nSurrogateKey derive(out_trans_key = max_Transaction_key + out_sutgate_key) ~> DerivedColumn1\ninsertEXIST, maxsurgagekey lookup(in_key == out_key,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> maxkey\nDerivedColumn, lkpincremental lookup(in_src_tbl == Src_Tab,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookupincr\nLookupincr filter(tran_date > Watermark_Value) ~> Filterincr\nDerivedColumn1 sink(input(\n\t\tTransaction_key as integer,\n\t\tcustomer_Key as integer,\n\t\tcustomer_id as integer,\n\t\ttransaction_id as string,\n\t\ttran_date as date,\n\t\tprod_subcat_code as integer,\n\t\tprod_cat_code as integer,\n\t\tQty as integer,\n\t\tRate as integer,\n\t\tTax as decimal(12,2),\n\t\ttotal_amt as decimal(12,2),\n\t\tStore_type as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tallowCopyCommand: true,\n\tmapColumn(\n\t\tcustomer_id = cust_id,\n\t\tcustomer_Key = lkp_d_key,\n\t\tTransaction_key = out_trans_key,\n\t\ttransaction_id,\n\t\ttran_date,\n\t\tprod_subcat_code,\n\t\tprod_cat_code,\n\t\tQty,\n\t\tRate,\n\t\tTax,\n\t\ttotal_amt,\n\t\tStore_type\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tsaveOrder: 1) ~> INSERTtransaction\nupdaterow sink(input(\n\t\tTransaction_key as integer,\n\t\tcustomer_Key as integer,\n\t\tcustomer_id as integer,\n\t\ttransaction_id as string,\n\t\ttran_date as date,\n\t\tprod_subcat_code as integer,\n\t\tprod_cat_code as integer,\n\t\tQty as integer,\n\t\tRate as integer,\n\t\tTax as decimal(12,2),\n\t\ttotal_amt as decimal(12,2),\n\t\tStore_type as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:true,\n\tupsertable:false,\n\tkeys:['transaction_id'],\n\tformat: 'table',\n\tstaged: true,\n\tallowCopyCommand: true,\n\tpostSQLs:['update config set [Watermark_Value]= (select max(tran_date) from Transactions)\\nwhere Src_Tab=\\'Transactions\\''],\n\tmapColumn(\n\t\tcustomer_Key = lkp_d_key,\n\t\ttransaction_id,\n\t\ttran_date,\n\t\tprod_subcat_code,\n\t\tprod_cat_code,\n\t\tQty,\n\t\tRate,\n\t\tTax,\n\t\ttotal_amt,\n\t\tStore_type\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tsaveOrder: 2) ~> UPDATEtransaction"
 				}
 			},
 			"dependsOn": [
@@ -5563,6 +5906,46 @@
 				"[concat(variables('factoryId'), '/datasets/emp_blob')]",
 				"[concat(variables('factoryId'), '/datasets/dept_blob')]",
 				"[concat(variables('factoryId'), '/datasets/datalake_target')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/tubling1hr')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipeline": {
+					"pipelineReference": {
+						"referenceName": "CopyPipeline_9y3",
+						"type": "PipelineReference"
+					},
+					"parameters": {
+						"windowStart": {
+							"type": "Expression",
+							"value": "[parameters('tubling1hr_properties_pipeline_parameters_windowStart')]"
+						},
+						"windowEnd": {
+							"type": "Expression",
+							"value": "[parameters('tubling1hr_properties_pipeline_parameters_windowEnd')]"
+						}
+					}
+				},
+				"type": "TumblingWindowTrigger",
+				"typeProperties": {
+					"frequency": "Minute",
+					"interval": 5,
+					"startTime": "2020-12-24T10:47:00.000Z",
+					"delay": "00:00:00",
+					"maxConcurrency": 50,
+					"retryPolicy": {
+						"intervalInSeconds": 30
+					},
+					"dependsOn": []
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/CopyPipeline_9y3')]"
 			]
 		}
 	]
