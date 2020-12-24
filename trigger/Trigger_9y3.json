@@ -2,7 +2,7 @@
 	"name": "Trigger_9y3",
 	"properties": {
 		"annotations": [],
-		"runtimeState": "Started",
+		"runtimeState": "Stopped",
 		"pipeline": {
 			"pipelineReference": {
 				"referenceName": "CopyPipeline_9y3",
