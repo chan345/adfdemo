@@ -1,0 +1,16 @@
+{
+	"name": "SQL script_polybase",
+	"properties": {
+		"content": {
+			"query": "CREATE MASTER KEY;\n\nCREATE DATABASE SCOPED CREDENTIAL BlobStorageCredential\nWITH\n    IDENTITY = 'blobuser',  \n\tSECRET = '+St1M+SxQCY9CLOoR8gf+vTbjIzaY2gEi7v/EGNR65OAXMv7aFfLrcwuIW8Xem9NEpyeTPb9xJkLR9hy4SoUyg=='   \n;\nGO\n\nCREATE EXTERNAL DATA SOURCE AzureBlobStorage\nWITH (\n    TYPE = HADOOP,\n    LOCATION = 'wasbs://input@myblobchandra.blob.core.windows.net',\n    CREDENTIAL = BlobStorageCredential\n);\nGO\n\nCREATE EXTERNAL FILE FORMAT CSVFileFormat \nWITH \n(   FORMAT_TYPE = DELIMITEDTEXT\n,   FORMAT_OPTIONS  (   FIELD_TERMINATOR = ','\n                    ,   STRING_DELIMITER = ''\n                    ,   DATE_FORMAT      = 'yyyy-MM-dd HH:mm:ss'\n                    ,   USE_TYPE_DEFAULT = FALSE \n                    )\n);\nGO\n\nEMP_ID,NAME,SALARY,DEPT_ID,LOC\nCREATE SCHEMA [stage];\nGO\n\nCREATE EXTERNAL TABLE [stage].emp_stg1\n(\n    [EMP_ID] int NULL,\n\t[NAME] varchar(50) NULL,\n\t[SALARY] int NULL,\n\t[DEPT_ID] int NULL,\n\t[LOC] varchar(50) NULL\n)\nWITH\n(\n    LOCATION='emp.csv' \n,   DATA_SOURCE = AzureBlobStorage\n,   FILE_FORMAT = CSVFileFormat\n,   REJECT_TYPE = VALUE\n,   REJECT_VALUE = 0\n)\nGO\n\nselect * from stage.emp_stg1\nCREATE SCHEMA [prod];\nGO\ndrop table prod.emp\n--DROP TABLE [prod].[FactTransactionHistory] \nCREATE TABLE [prod].[emp1]  \nWITH (DISTRIBUTION = HASH([emp_id]  ) ) \nAS \nSELECT * FROM [stage].[emp_stg1]        \nOPTION (LABEL = 'Load [prod].[emp]');\n\nselect * from prod.emp1\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"name": "harshitsynape",
+				"type": "SqlPool"
+			}
+		},
+		"type": "SqlQuery"
+	}
+}
