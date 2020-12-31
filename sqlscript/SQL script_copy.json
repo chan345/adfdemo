@@ -1,0 +1,16 @@
+{
+	"name": "SQL script_copy",
+	"properties": {
+		"content": {
+			"query": "COPY INTO [dbo].[country]\nFROM 'https://datalake099.blob.core.windows.net/input/country.csv'\nWITH\n(\n    FILE_TYPE = 'CSV',\n    FIELDTERMINATOR = ',',\n    FIELDQUOTE = '',\n    ROWTERMINATOR='row_terminator',\n    COMPRESSION = 'Snappy'\n)\nOPTION (LABEL = 'COPY : Load [dbo].[country] - Taxi dataset');\n\nCOPY INTO [country]\nFROM 'https://datalake099.blob.core.windows.net/input/country.csv'\nWITH \n(\n    FILE_TYPE = 'CSV',\n    CREDENTIAL = (IDENTITY='Managed Identity'),\n    ENCODING = 'UTF8',\n    FIELDTERMINATOR = ','\n)\n\nselect * from country",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"name": "harshitsynape",
+				"type": "SqlPool"
+			}
+		},
+		"type": "SqlQuery"
+	}
+}

@@ -1,0 +1,16 @@
+{
+	"name": "SQL script_Trip",
+	"properties": {
+		"content": {
+			"query": "CREATE TABLE [dbo].[country]\n(\n    [id] varchar(50) NULL,\n    [name] varchar(50) NULL,\n    [country] varchar(50) NULL,\n    [extra] varchar(50) NULL\n)\nWITH\n(\n    DISTRIBUTION = ROUND_ROBIN\n);",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"name": "harshitsynape",
+				"type": "SqlPool"
+			}
+		},
+		"type": "SqlQuery"
+	}
+}
