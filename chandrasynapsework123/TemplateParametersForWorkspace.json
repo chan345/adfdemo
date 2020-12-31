@@ -1,0 +1,84 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"value": "chandrasynapsework123"
+		},
+		"AzureDataLakeStorage_accountKey": {
+			"value": ""
+		},
+		"AzureDataLakeStorage1_accountKey": {
+			"value": ""
+		},
+		"AzureSqlDatabase_connectionString": {
+			"value": ""
+		},
+		"AzureSynapseAnalytics_connectionString": {
+			"value": ""
+		},
+		"SqlServer_on_premises_connectionString": {
+			"value": ""
+		},
+		"SqlServer_on_premises_password": {
+			"value": ""
+		},
+		"blob_input_connectionString": {
+			"value": ""
+		},
+		"chandrasynapsework123-WorkspaceDefaultSqlServer_connectionString": {
+			"value": ""
+		},
+		"sqldb_connectionString": {
+			"value": ""
+		},
+		"stage_plybase_connectionString": {
+			"value": ""
+		},
+		"AzureDataLakeStorage_properties_typeProperties_url": {
+			"value": "https://datalakegn21.dfs.core.windows.net"
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"value": "https://datalake099.dfs.core.windows.net"
+		},
+		"AzureKeyVault1_properties_typeProperties_baseUrl": {
+			"value": "https://keyvalutlake.vault.azure.net/"
+		},
+		"SqlServer_on_premises_properties_typeProperties_userName": {
+			"value": "HAPPIESTMINDS\\Chandra.babu"
+		},
+		"chandrasynapsework123-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://datalake099.dfs.core.windows.net"
+		},
+		"Trigger_4oi_properties_pipeline_parameters_windowStart": {
+			"value": "@trigger().outputs.windowStartTime"
+		},
+		"Trigger_4oi_properties_pipeline_parameters_windowEnd": {
+			"value": "@trigger().outputs.windowEndTime"
+		},
+		"Trigger_5qt_properties_pipeline_schedule_trigger_parameters_windowStart": {
+			"value": "@{addminutes(trigger().scheduledTime, -3)}"
+		},
+		"Trigger_5qt_properties_pipeline_schedule_trigger_parameters_windowEnd": {
+			"value": "@trigger().scheduledTime"
+		},
+		"Trigger_9y3_properties_pipeline_parameters_windowStart": {
+			"value": "@trigger().outputs.windowStartTime"
+		},
+		"Trigger_9y3_properties_pipeline_parameters_windowEnd": {
+			"value": "@trigger().outputs.windowEndTime"
+		},
+		"trigger4_properties_pipeline_parameters_start": {
+			"value": "@trigger().outputs.windowStartTime"
+		},
+		"trigger4_properties_pipeline_parameters_end": {
+			"value": "@trigger().outputs.windowEndTime"
+		},
+		"tubling1hr_properties_pipeline_parameters_windowStart": {
+			"value": "@trigger().outputs.windowStartTime"
+		},
+		"tubling1hr_properties_pipeline_parameters_windowEnd": {
+			"value": "@trigger().outputs.windowEndTime"
+		}
+	}
+}
