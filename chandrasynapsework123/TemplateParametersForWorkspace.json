@@ -36,7 +36,7 @@
 			"value": ""
 		},
 		"AzureDataLakeStorage_properties_typeProperties_url": {
-			"value": "https://datalakegn21.dfs.core.windows.net"
+			"value": "https://datalake099.dfs.core.windows.net"
 		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"value": "https://datalake099.dfs.core.windows.net"
