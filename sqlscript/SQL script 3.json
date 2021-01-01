@@ -1,0 +1,16 @@
+{
+	"name": "SQL script 3",
+	"properties": {
+		"content": {
+			"query": "select * from prod.emp1\n\ntruncate table prod.emp1",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"name": "harshitsynape",
+				"type": "SqlPool"
+			}
+		},
+		"type": "SqlQuery"
+	}
+}

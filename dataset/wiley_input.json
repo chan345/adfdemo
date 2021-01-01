@@ -2,7 +2,7 @@
 	"name": "wiley_input",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureDataLakeStorage1",
+			"referenceName": "AzureDataLakeStorage",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "country.txt",
+				"fileName": "country.csv",
 				"fileSystem": "input"
 			},
 			"columnDelimiter": ",",

@@ -1,0 +1,33 @@
+{
+	"name": "synapse_wiley",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSynapseAnalytics",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlDWTable",
+		"schema": [
+			{
+				"name": "id",
+				"type": "varchar"
+			},
+			{
+				"name": "name",
+				"type": "varchar"
+			},
+			{
+				"name": "country",
+				"type": "varchar"
+			},
+			{
+				"name": "extra",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "prod",
+			"table": "emp1"
+		}
+	}
+}

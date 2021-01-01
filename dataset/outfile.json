@@ -2,7 +2,7 @@
 	"name": "outfile",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureDataLakeStorage1",
+			"referenceName": "AzureDataLakeStorage",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
