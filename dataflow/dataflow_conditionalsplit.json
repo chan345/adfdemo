@@ -25,7 +25,7 @@
 						"referenceName": "datalake_target",
 						"type": "DatasetReference"
 					},
-					"name": "sink1"
+					"name": "sinkHR"
 				},
 				{
 					"dataset": {
@@ -53,7 +53,7 @@
 					"name": "Select1"
 				}
 			],
-			"script": "source(output(\n\t\tEMP_ID as integer,\n\t\tNAME as string,\n\t\tSALARY as integer,\n\t\tDEPT_ID as integer,\n\t\tLOC as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source1\nsource(output(\n\t\tDept_id as integer,\n\t\tdept_name as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source2\nsource1, source2 join(source1@DEPT_ID == source2@Dept_id,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Join1\nSelect1 split(equals(DEPT_ID,10),\n\tequals(DEPT_ID,10),\n\tequals(DEPT_ID,30),\n\tdisjoint: true) ~> ConditionalSplit1@(HR, IT, ADMIN, default)\nJoin1 select(mapColumn(\n\t\tEMP_ID,\n\t\tNAME,\n\t\tSALARY,\n\t\tDEPT_ID = source1@DEPT_ID,\n\t\tLOC,\n\t\tdept_name\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nConditionalSplit1@HR sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['HR.csv'],\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1\nConditionalSplit1@IT sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['IT.csv'],\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink2\nConditionalSplit1@ADMIN sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['Admin.csv'],\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink3"
+			"script": "source(output(\n\t\tEMP_ID as integer,\n\t\tNAME as string,\n\t\tSALARY as integer,\n\t\tDEPT_ID as integer,\n\t\tLOC as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source1\nsource(output(\n\t\tDept_id as integer,\n\t\tdept_name as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source2\nsource1, source2 join(source1@DEPT_ID == source2@Dept_id,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Join1\nSelect1 split(equals(DEPT_ID,10),\n\tequals(DEPT_ID,10),\n\tequals(DEPT_ID,30),\n\tdisjoint: true) ~> ConditionalSplit1@(HR, IT, ADMIN, default)\nJoin1 select(mapColumn(\n\t\tEMP_ID,\n\t\tNAME,\n\t\tSALARY,\n\t\tDEPT_ID = source1@DEPT_ID,\n\t\tLOC,\n\t\tdept_name\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nConditionalSplit1@HR sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['HR.csv'],\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sinkHR\nConditionalSplit1@IT sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['IT.csv'],\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink2\nConditionalSplit1@ADMIN sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['Admin.csv'],\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink3"
 		}
 	}
 }
