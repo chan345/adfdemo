@@ -1,0 +1,21 @@
+{
+	"name": "ls_blob",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobStorage",
+		"typeProperties": {
+			"connectionString": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVault2",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "bolbscrect"
+			}
+		},
+		"connectVia": {
+			"referenceName": "integrationRuntimecustom",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
