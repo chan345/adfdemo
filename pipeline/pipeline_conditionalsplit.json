@@ -19,8 +19,8 @@
 						"referenceName": "dataflow_conditionalsplit",
 						"type": "DataFlowReference",
 						"datasetParameters": {
-							"sink1": {
-								"directry": "file"
+							"sinkHR": {
+								"directry": "input"
 							},
 							"sink2": {
 								"directry": "file"
