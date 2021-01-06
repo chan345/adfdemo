@@ -29,5 +29,6 @@
 			"schema": "prod",
 			"table": "emp1"
 		}
-	}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
 }
